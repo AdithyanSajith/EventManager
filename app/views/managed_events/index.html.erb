@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Managed events" %>
+
+<h1>Managed events</h1>
+
+<div id="managed_events">
+  <% @managed_events.each do |managed_event| %>
+    <%= render managed_event %>
+    <p>
+      <%= link_to "Show this managed event", managed_event %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New managed event", new_managed_event_path %>

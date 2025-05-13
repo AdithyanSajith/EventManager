@@ -1,0 +1,31 @@
+<div id="<%= dom_id(event) %>">
+  <p>
+    <strong>Title:</strong>
+    <%= event.title %>
+  </p>
+
+  <p>
+    <strong>Description:</strong>
+    <%= event.description %>
+  </p>
+
+  <p>
+    <strong>Starts at:</strong>
+    <%= event.starts_at %>
+  </p>
+
+  <p>
+    <strong>Ends at:</strong>
+    <%= event.ends_at %>
+  </p>
+
+  <p>
+    <strong>Category:</strong>
+    <%= event.category.name if event.category %>
+  </p>
+
+  <p>
+    <strong>Venue:</strong>
+    <%= event.venue.name if event.venue %>
+  </p>
+</div>

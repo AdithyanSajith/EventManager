@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  registration: one
+  ticket_number: MyString
+  issued_at: 2025-05-13 13:55:02
+
+two:
+  registration: two
+  ticket_number: MyString
+  issued_at: 2025-05-13 13:55:02

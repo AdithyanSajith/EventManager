@@ -1,0 +1,87 @@
+<!-- app/views/participants/change_category.html.erb -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change Category</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: 'Arial', sans-serif;
+      }
+      .navbar {
+        background-color: #007bff;
+      }
+      .navbar-brand {
+        color: white;
+        font-weight: bold;
+      }
+      .form-container {
+        max-width: 600px;
+        margin: 50px auto;
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .btn-custom {
+        background-color: #007bff;
+        color: white;
+      }
+      .btn-custom:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container-fluid">
+        <%= link_to "Event Manager", root_path, class: "navbar-brand" %>
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav ms-auto">
+            <% if participant_signed_in? %>
+              <li class="nav-item">
+                <%= link_to "Change Category", change_category_path, class: "nav-link" %>
+              </li>
+              <li class="nav-item">
+                <%= link_to "Logout", destroy_participant_session_path, method: :delete, class: "nav-link" %>
+              </li>
+            <% else %>
+              <li class="nav-item">
+                <%= link_to "Login as Participant", new_participant_session_path, class: "nav-link" %>
+              </li>
+              <li class="nav-item">
+                <%= link_to "Login as Host", new_host_session_path, class: "nav-link" %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="form-container">
+      <h2 class="text-center mb-4">Change Category</h2>
+      <p class="text-center">Please select a new category for your interest:</p>
+      
+      <%= form_with url: update_interest_path, method: :patch do |form| %>
+        <div class="mb-3">
+          <%= form.label :interest, "Choose a Category", class: "form-label" %>
+          <%= form.collection_select :interest, @categories, :id, :name, prompt: "Select Category", class: "form-control" %>
+        </div>
+        <%= form.submit "Update Interest", class: "btn btn-custom w-100" %>
+      <% end %>
+
+      <div class="text-center mt-3">
+        <%= link_to "Back", choose_category_path, class: "btn btn-secondary" %>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+  </body>
+</html>

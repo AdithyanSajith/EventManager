@@ -1,0 +1,12 @@
+<% content_for :title, "Editing managed event" %>
+
+<h1>Editing managed event</h1>
+
+<%= render "form", managed_event: @managed_event %>
+
+<br>
+
+<div>
+  <%= link_to "Show this managed event", @managed_event %> |
+  <%= link_to "Back to managed events", managed_events_path %>
+</div>

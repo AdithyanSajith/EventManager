@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @managed_event %>
+
+<div>
+  <%= link_to "Edit this managed event", edit_managed_event_path(@managed_event) %> |
+  <%= link_to "Back to managed events", managed_events_path %>
+
+  <%= button_to "Destroy this managed event", @managed_event, method: :delete %>
+</div>

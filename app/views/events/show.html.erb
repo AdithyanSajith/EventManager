@@ -1,0 +1,30 @@
+<div class="container my-5">
+  <h2 class="text-center mb-4"><%= @event.title %></h2>
+  <p class="lead"><%= @event.description %></p>
+
+  <div class="mb-3">
+    <p><strong>Starts at:</strong> <%= @event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
+    <p><strong>Ends at:</strong> <%= @event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
+    <p><strong>Venue:</strong> <%= @event.venue.name if @event.venue %></p>
+    <p><strong>Category:</strong> <%= @event.category.name if @event.category %></p>
+  </div>
+
+  <% if @ticket %>
+    <div class="alert alert-success">
+      <h4>Your Ticket</h4>
+      <p><strong>Ticket Number:</strong> <%= @ticket.ticket_number %></p>
+      <p><strong>Issued At:</strong> <%= @ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
+    </div>
+  <% elsif @payment %>
+    <div class="alert alert-warning">
+      <p>You have paid but no ticket was issued.</p>
+    </div>
+  <% elsif @registration %>
+    <div class="alert alert-info">
+      <p>You are registered but have not completed payment.</p>
+      <%= link_to "Complete Payment", new_event_payment_path(@event), class: "btn btn-primary" %>
+    </div>
+  <% else %>
+    <%= link_to "Register & Pay", new_event_payment_path(@event), class: "btn btn-primary" %>
+  <% end %>
+</div>

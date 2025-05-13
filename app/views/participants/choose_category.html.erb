@@ -1,0 +1,12 @@
+<!-- app/views/participants/choose_category.html.erb -->
+<h1>Choose Your Category</h1>
+
+<p>Select your preferred category:</p>
+
+<%= form_with url: set_preference_path, method: :post do |form| %>
+  <div class="form-group">
+    <%= form.label :interest, "Choose a Category" %>
+    <%= form.collection_select :interest, @categories, :id, :name, prompt: "Select Category", class: "form-control" %>
+  </div>
+  <%= form.submit "Save Preference", class: "btn btn-primary" %>
+<% end %>
