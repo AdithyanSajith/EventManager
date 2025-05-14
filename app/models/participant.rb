@@ -5,6 +5,6 @@ class Participant < ApplicationRecord
          :recoverable, :rememberable, :validatable
   has_many :registrations
   has_many :events, through: :registrations
-  has_many :reviews
+   has_many :reviews, foreign_key: :user_id
   has_many :tickets, through: :registrations
 end

@@ -1,37 +1,37 @@
-<%= form_with(model: review) do |form| %>
+<%= form_with(model: review, local: true) do |form| %>
   <% if review.errors.any? %>
-    <div style="color: red">
+    <div id="error_explanation">
       <h2><%= pluralize(review.errors.count, "error") %> prohibited this review from being saved:</h2>
-
       <ul>
-        <% review.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+        <% review.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :rating, style: "display: block" %>
-    <%= form.number_field :rating %>
+  <div class="mb-3">
+    <%= form.label :rating %>
+    <%= form.number_field :rating, class: "form-control", min: 1, max: 5 %>
   </div>
 
-  <div>
-    <%= form.label :comment, style: "display: block" %>
-    <%= form.text_area :comment %>
+  <div class="mb-3">
+    <%= form.label :comment %>
+    <%= form.text_area :comment, class: "form-control", rows: 4 %>
   </div>
 
-  <div>
-    <%= form.label :participant_id, style: "display: block" %>
-    <%= form.text_field :participant_id %>
+  <div class="mb-3">
+    <%= form.label :participant_id, "Participant" %>
+    <%= form.collection_select :participant_id, Participant.all, :id, :name, prompt: "Select Participant", class: "form-control" %>
   </div>
 
-  <div>
-    <%= form.label :event_id, style: "display: block" %>
-    <%= form.text_field :event_id %>
+  <div class="mb-3">
+    <%= form.label :event_id, "Event" %>
+    <%= form.collection_select :event_id, Event.all, :id, :title, prompt: "Select Event", class: "form-control" %>
   </div>
 
-  <div>
-    <%= form.submit %>
+  <div class="mt-4">
+    <%= form.submit "Create Review", class: "btn btn-primary" %>
+    <%= link_to "Back to reviews", reviews_path, class: "btn btn-secondary ms-2" %>
   </div>
 <% end %>

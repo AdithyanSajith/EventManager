@@ -1,30 +1,62 @@
 <div class="container my-5">
-  <h2 class="text-center mb-4"><%= @event.title %></h2>
-  <p class="lead"><%= @event.description %></p>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="card-title text-primary"><%= @event.title %></h2>
+      <p class="card-text"><%= @event.description %></p>
 
-  <div class="mb-3">
-    <p><strong>Starts at:</strong> <%= @event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
-    <p><strong>Ends at:</strong> <%= @event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
-    <p><strong>Venue:</strong> <%= @event.venue.name if @event.venue %></p>
-    <p><strong>Category:</strong> <%= @event.category.name if @event.category %></p>
+      <p><strong>Starts at:</strong> <%= @event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
+      <p><strong>Ends at:</strong> <%= @event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
+      <p><strong>Venue:</strong> <%= @event.venue.name %></p>
+      <p><strong>Category:</strong> <%= @event.category.name %></p>
+
+      <% if participant_signed_in? %>
+        <% if @ticket %>
+          <div class="alert alert-success mt-4">
+            <h4>Your Ticket</h4>
+            <p><strong>Ticket Number:</strong> <%= @ticket.ticket_number %></p>
+            <p><strong>Issued At:</strong> <%= @ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
+          </div>
+        <% elsif @payment %>
+          <div class="alert alert-warning mt-4">
+            <p>You have paid but no ticket was issued.</p>
+          </div>
+        <% elsif @registration %>
+          <div class="alert alert-info mt-4">
+            <p>You are registered but have not completed payment.</p>
+            <%= link_to "💳 Complete Payment", new_event_payment_path(@event), class: "btn btn-primary mt-2" %>
+          </div>
+        <% else %>
+          <%= link_to "💳 Register & Pay", new_event_payment_path(@event), class: "btn btn-primary mt-3" %>
+        <% end %>
+      <% end %>
+
+      <% if host_signed_in? && current_host == @event.host %>
+        <%= link_to "🗑️ Delete Event", event_path(@event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger mt-3" %>
+      <% end %>
+    </div>
   </div>
 
-  <% if @ticket %>
-    <div class="alert alert-success">
-      <h4>Your Ticket</h4>
-      <p><strong>Ticket Number:</strong> <%= @ticket.ticket_number %></p>
-      <p><strong>Issued At:</strong> <%= @ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
-    </div>
-  <% elsif @payment %>
-    <div class="alert alert-warning">
-      <p>You have paid but no ticket was issued.</p>
-    </div>
-  <% elsif @registration %>
-    <div class="alert alert-info">
-      <p>You are registered but have not completed payment.</p>
-      <%= link_to "Complete Payment", new_event_payment_path(@event), class: "btn btn-primary" %>
-    </div>
-  <% else %>
-    <%= link_to "Register & Pay", new_event_payment_path(@event), class: "btn btn-primary" %>
-  <% end %>
+  <!-- Reviews Section -->
+  <div class="mt-5">
+    <h3>📝 Reviews</h3>
+
+    <% if @event.reviews.any? %>
+      <% @event.reviews.each do |review| %>
+        <% next unless review.reviewable_type == "Event" %>
+        <div class="card my-3 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-2">⭐ <%= review.rating %>/5</h5>
+            <p class="card-text"><%= review.comment %></p>
+            <p class="text-muted mb-0">By: <%= review.participant.name if review.participant %></p>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="text-muted">No reviews yet for this event.</p>
+    <% end %>
+
+    <% if participant_signed_in? %>
+      <%= link_to "✍️ Write a Review", new_review_path(reviewable_id: @event.id, reviewable_type: "Event"), class: "btn btn-outline-primary mt-3" %>
+    <% end %>
+  </div>
 </div>

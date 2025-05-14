@@ -3,10 +3,18 @@ class EventsController < ApplicationController
   before_action :authenticate_participant!, only: [:show]
 
   def show
+  @event = Event.find(params[:id])
+
+  if participant_signed_in?
     @registration = current_participant.registrations.find_by(event: @event)
     @payment = @registration&.payment
     @ticket = @registration&.ticket
+  elsif host_signed_in?
+    @registrations = @event.registrations.includes(:participant)
   end
+end
+
+
 
   def index
     @events = Event.all
@@ -15,12 +23,10 @@ class EventsController < ApplicationController
   def new
     @event = Event.new
   end
-  
-  def filtered
-  @events = Event.joins(:category).where(categories: { name: current_participant.interest })
-  render :filtered
-end
 
+  def filtered
+    @events = Event.where(category_id: current_participant.interest)
+  end
 
   def create
     @event = current_host.events.build(event_params)
@@ -42,8 +48,19 @@ end
   end
 
   def destroy
-    @event.destroy
-    redirect_to events_path, notice: "Event was successfully destroyed."
+    puts "HOST ID: #{current_host&.id}"  # ✅ move this inside the method
+
+    if host_signed_in?
+      @event = current_host.events.find_by(id: params[:id])
+      if @event
+        @event.destroy
+        redirect_to events_path, notice: "Event deleted successfully."
+      else
+        redirect_to events_path, alert: "You are not authorized to delete this event."
+      end
+    else
+      redirect_to root_path, alert: "You must be logged in as a host to delete events."
+    end
   end
 
   private

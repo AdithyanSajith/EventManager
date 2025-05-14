@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_13_101331) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_14_062341) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -87,6 +87,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_13_101331) do
     t.bigint "registration_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "card_number"
     t.index ["registration_id"], name: "index_payments_on_registration_id"
   end
 
@@ -104,11 +105,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_13_101331) do
     t.integer "rating"
     t.text "comment"
     t.bigint "participant_id", null: false
-    t.bigint "event_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["event_id"], name: "index_reviews_on_event_id"
+    t.string "reviewable_type", null: false
+    t.bigint "reviewable_id", null: false
     t.index ["participant_id"], name: "index_reviews_on_participant_id"
+    t.index ["reviewable_type", "reviewable_id"], name: "index_reviews_on_reviewable"
   end
 
   create_table "tickets", force: :cascade do |t|
@@ -141,7 +143,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_13_101331) do
   add_foreign_key "payments", "registrations"
   add_foreign_key "registrations", "events"
   add_foreign_key "registrations", "participants"
-  add_foreign_key "reviews", "events"
   add_foreign_key "reviews", "participants"
   add_foreign_key "tickets", "registrations"
   add_foreign_key "venues", "hosts"
