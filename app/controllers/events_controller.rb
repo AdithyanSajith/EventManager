@@ -1,31 +1,14 @@
 class EventsController < ApplicationController
-  before_action :set_event, only: %i[show edit update destroy]
-  before_action :authenticate_participant!, only: [:show]
-
-  def show
-  @event = Event.find(params[:id])
-
-  if participant_signed_in?
-    @registration = current_participant.registrations.find_by(event: @event)
-    @payment = @registration&.payment
-    @ticket = @registration&.ticket
-  elsif host_signed_in?
-    @registrations = @event.registrations.includes(:participant)
-  end
-end
-
-
-
+  before_action :authenticate_host!, only: [:new, :create, :edit, :update, :destroy, :index]
+  before_action :authenticate_participant!, only: [:filtered, :show]
+  before_action :set_event, only: [:show, :edit, :update]
+  
   def index
-    @events = Event.all
+    @events = current_host.events # 🔐 Only events created by this host
   end
 
   def new
     @event = Event.new
-  end
-
-  def filtered
-    @events = Event.where(category_id: current_participant.interest)
   end
 
   def create
@@ -37,29 +20,49 @@ end
     end
   end
 
-  def edit; end
+  def show
+    # @event is already set in before_action
+
+    if participant_signed_in?
+      @registration = current_participant.registrations.find_by(event: @event)
+      @payment = @registration&.payment
+      @ticket = @registration&.ticket
+    elsif host_signed_in? && current_host == @event.host
+      @registrations = @event.registrations.includes(:participant)
+    else
+      redirect_to root_path, alert: "You are not authorized to view this event."
+    end
+  end
+
+  def filtered
+    @events = Event.where(category_id: current_participant.interest)
+  end
+
+  def edit
+    unless current_host == @event.host
+      redirect_to events_path, alert: "You can only edit your own events."
+    end
+  end
 
   def update
-    if @event.update(event_params)
-      redirect_to @event, notice: "Event was successfully updated."
+    if current_host == @event.host
+      if @event.update(event_params)
+        redirect_to @event, notice: "Event was successfully updated."
+      else
+        render :edit, status: :unprocessable_entity
+      end
     else
-      render :edit, status: :unprocessable_entity
+      redirect_to events_path, alert: "You can only update your own events."
     end
   end
 
   def destroy
-    puts "HOST ID: #{current_host&.id}"  # ✅ move this inside the method
-
-    if host_signed_in?
-      @event = current_host.events.find_by(id: params[:id])
-      if @event
-        @event.destroy
-        redirect_to events_path, notice: "Event deleted successfully."
-      else
-        redirect_to events_path, alert: "You are not authorized to delete this event."
-      end
+    event = current_host.events.find_by(id: params[:id])
+    if event
+      event.destroy
+      redirect_to events_path, notice: "Event deleted successfully."
     else
-      redirect_to root_path, alert: "You must be logged in as a host to delete events."
+      redirect_to events_path, alert: "You are not authorized to delete this event."
     end
   end
 
