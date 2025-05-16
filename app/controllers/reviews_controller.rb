@@ -21,7 +21,7 @@ def new
     participant_id: current_participant.id
   )
 
-  @event = reviewable if reviewable_class == Event  # 👈 Add this
+  @event = reviewable if reviewable_class == Event
 end
 
 

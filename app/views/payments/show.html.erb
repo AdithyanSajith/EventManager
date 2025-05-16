@@ -1,10 +1,20 @@
-<p style="color: green"><%= notice %></p>
-
-<%= render @payment %>
-
-<div>
-  <%= link_to "Edit this payment", edit_payment_path(@payment) %> |
-  <%= link_to "Back to payments", payments_path %>
-
-  <%= button_to "Destroy this payment", @payment, method: :delete %>
-</div>
+<% if current_user&.role == "participant" %>
+  <% if @ticket %>
+    <div class="alert alert-success mt-4">
+      <h4>Your Ticket</h4>
+      <p><strong>Ticket Number:</strong> <%= @ticket.ticket_number %></p>
+      <p><strong>Issued At:</strong> <%= @ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
+    </div>
+  <% elsif @payment %>
+    <div class="alert alert-warning mt-4">
+      <p>You have paid but no ticket was issued.</p>
+    </div>
+  <% elsif @registration %>
+    <div class="alert alert-info mt-4">
+      <p>You are registered but have not completed payment.</p>
+      <%= link_to "💳 Complete Payment", new_event_payment_path(@event), class: "btn btn-primary mt-2" %>
+    </div>
+  <% else %>
+    <%= link_to "💳 Register & Pay", new_event_payment_path(@event), class: "btn btn-primary mt-3" %>
+  <% end %>
+<% end %>

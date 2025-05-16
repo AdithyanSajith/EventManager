@@ -1,15 +1,17 @@
-<%= form_with model: [@event, Payment.new], local: true do |form| %>
-  <div class="mb-3">
-    <label for="amount" class="form-label">Amount</label>
-    <%= form.text_field :amount, class: "form-control", readonly: true, value: 100.0 %>
-  </div>
+<div class="container my-5">
+  <h2 class="mb-4">💳 Make a Payment for <%= @event.title %></h2>
 
-  <div class="mb-3">
-    <label for="card_number" class="form-label">Card Number</label>
-    <%= form.text_field :card_number, class: "form-control" %>
-  </div>
+  <%= form_with model: [@event, @payment], local: true do |f| %>
+    <div class="mb-3">
+      <%= f.label :amount, "Amount" %>
+      <%= f.number_field :amount, class: "form-control", required: true %>
+    </div>
 
-  <div class="mb-3">
-    <%= form.submit "Pay Now", class: "btn btn-success" %>
-  </div>
-<% end %>
+    <div class="mb-3">
+      <%= f.label :card_number, "Card Number" %>
+      <%= f.text_field :card_number, class: "form-control", required: true %>
+    </div>
+
+    <%= f.submit "Pay Now", class: "btn btn-success" %>
+  <% end %>
+</div>

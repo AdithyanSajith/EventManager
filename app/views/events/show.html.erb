@@ -9,7 +9,7 @@
       <p><strong>Venue:</strong> <%= @event.venue.name %></p>
       <p><strong>Category:</strong> <%= @event.category.name %></p>
 
-      <% if participant_signed_in? %>
+      <% if current_user&.role == "participant" %>
         <% if @ticket %>
           <div class="alert alert-success mt-4">
             <h4>Your Ticket</h4>
@@ -30,7 +30,7 @@
         <% end %>
       <% end %>
 
-      <% if host_signed_in? && current_host == @event.host %>
+      <% if current_user&.role == "host" && current_user == @event.host %>
         <%= link_to "🗑️ Delete Event", event_path(@event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger mt-3" %>
       <% end %>
     </div>
@@ -55,7 +55,7 @@
       <p class="text-muted">No reviews yet for this event.</p>
     <% end %>
 
-    <% if participant_signed_in? %>
+    <% if current_user&.role == "participant" %>
       <%= link_to "✍️ Write a Review", new_review_path(reviewable_id: @event.id, reviewable_type: "Event"), class: "btn btn-outline-primary mt-3" %>
     <% end %>
   </div>
