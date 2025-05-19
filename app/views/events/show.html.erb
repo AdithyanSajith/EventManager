@@ -31,7 +31,10 @@
       <% end %>
 
       <% if current_user&.role == "host" && current_user == @event.host %>
-        <%= link_to "🗑️ Delete Event", event_path(@event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger mt-3" %>
+        <%= button_to "🗑️ Delete Event", event_path(@event),
+              method: :delete,
+              data: { confirm: "Are you sure?" },
+              class: "btn btn-danger mt-3" %>
       <% end %>
     </div>
   </div>

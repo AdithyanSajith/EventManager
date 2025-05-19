@@ -102,4 +102,9 @@ Rails.application.configure do
   # ]
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  # ✅ Fix Windows file lock issue with Sprockets during asset precompile
+config.assets.configure do |env|
+  env.cache = Sprockets::Cache::FileStore.new(Rails.root.join("tmp", "sprockets_custom_cache"))
+end
+
 end

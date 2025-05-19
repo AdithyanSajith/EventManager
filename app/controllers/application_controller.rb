@@ -4,15 +4,23 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   def after_sign_in_path_for(resource)
-    case resource&.role
+  if resource.is_a?(AdminUser)
+    admin_root_path
+  elsif resource.respond_to?(:role)
+    case resource.role
     when 'participant'
       resource.interest.blank? ? choose_category_path : filtered_events_path
     when 'host'
-      events_path
+      host_dashboard_path
     else
       root_path
     end
+  else
+    root_path
   end
+end
+
+
 
   protected
 

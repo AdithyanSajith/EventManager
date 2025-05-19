@@ -1,0 +1,17 @@
+<h1>Your Hosted Events</h1>
+
+<% if @events.any? %>
+  <ul>
+    <% @events.each do |event| %>
+      <li>
+        <strong><%= link_to event.title, event_path(event) %></strong>
+        <br>
+        <small><%= event.starts_at.strftime("%b %d, %Y %I:%M %p") if event.starts_at %></small>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>You haven't created any events yet.</p>
+<% end %>
+
+<%= link_to "Create New Event", new_event_path, class: "button" %>

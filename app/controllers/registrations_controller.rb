@@ -1,25 +1,20 @@
-class RegistrationsController < ApplicationController
-  before_action :authenticate_user!
-  before_action :ensure_participant!
+module Users
+  class RegistrationsController < Devise::RegistrationsController
+    before_action :configure_permitted_parameters
 
-  def create
-    @registration = current_user.registrations.build(event_id: params[:event_id])
-    if @registration.save
-      redirect_to @registration.event, notice: "You have successfully registered."
-    else
-      redirect_to events_path, alert: "Registration failed."
+    protected
+
+    def configure_permitted_parameters
+      devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :role])
+      devise_parameter_sanitizer.permit(:account_update, keys: [:name, :role])
     end
-  end
 
-  def destroy
-    @registration = current_user.registrations.find(params[:id])
-    @registration.destroy
-    redirect_to events_path, notice: "Registration canceled."
-  end
-
-  private
-
-  def ensure_participant!
-    redirect_to root_path, alert: "Only participants can register for events." unless current_user.role == "participant"
+    def after_sign_up_path_for(resource)
+      if resource.role == "host"
+        host_dashboard_path
+      else
+        choose_category_path
+      end
+    end
   end
 end

@@ -1,8 +1,7 @@
 <%= form_with(model: @review, local: true) do |form| %>
   <%= form.hidden_field :reviewable_id, value: @event.id %>
   <%= form.hidden_field :reviewable_type, value: "Event" %>
-  <%= form.hidden_field :participant_id, value: current_participant.id %>
-
+  <%= form.hidden_field :participant_id, value: current_user.id %>
 
   <div class="mb-3">
     <%= form.label :rating %>
