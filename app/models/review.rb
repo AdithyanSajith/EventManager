@@ -8,22 +8,10 @@ class Review < ApplicationRecord
   }
 
   def self.ransackable_attributes(auth_object = nil)
-    %w[
-      id
-      content
-      rating
-      participant_id
-      reviewable_id
-      reviewable_type
-      created_at
-      updated_at
-    ]
+    %w[id content comment rating participant_id reviewable_id reviewable_type created_at updated_at]
   end
 
   def self.ransackable_associations(auth_object = nil)
-    %w[
-      participant
-      reviewable
-    ]
+    %w[participant reviewable]
   end
 end

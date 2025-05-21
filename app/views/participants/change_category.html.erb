@@ -11,13 +11,6 @@
         background-color: #f8f9fa;
         font-family: 'Arial', sans-serif;
       }
-      .navbar {
-        background-color: #007bff;
-      }
-      .navbar-brand {
-        color: white;
-        font-weight: bold;
-      }
       .form-container {
         max-width: 600px;
         margin: 50px auto;
@@ -36,31 +29,6 @@
     </style>
   </head>
   <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
-      <div class="container-fluid">
-        <%= link_to "Event Manager", root_path, class: "navbar-brand" %>
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav ms-auto">
-            <% if user_signed_in? && current_user.role == "participant" %>
-              <li class="nav-item">
-                <%= link_to "Change Category", change_category_path, class: "nav-link text-white" %>
-              </li>
-              <li class="nav-item">
-                <%= link_to "Logout", destroy_user_session_path, method: :delete, class: "nav-link text-white" %>
-              </li>
-            <% else %>
-              <li class="nav-item">
-                <%= link_to "Login as Participant", new_user_session_path, class: "nav-link text-white" %>
-              </li>
-              <li class="nav-item">
-                <%= link_to "Login as Host", new_user_session_path, class: "nav-link text-white" %>
-              </li>
-            <% end %>
-          </ul>
-        </div>
-      </div>
-    </nav>
 
     <!-- Main Content -->
     <div class="form-container">
@@ -74,10 +42,6 @@
         </div>
         <%= form.submit "Update Interest", class: "btn btn-custom w-100" %>
       <% end %>
-
-      <div class="text-center mt-3">
-        <%= link_to "Back", choose_category_path, class: "btn btn-secondary" %>
-      </div>
     </div>
 
     <!-- Bootstrap JS -->

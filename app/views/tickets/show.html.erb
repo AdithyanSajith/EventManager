@@ -1,10 +1,33 @@
-<p style="color: green"><%= notice %></p>
+<div class="container my-5">
+  <h2 class="text-center mb-4">🎫 Your Ticket</h2>
 
-<%= render @ticket %>
+  <% if notice %>
+    <div class="alert alert-success text-center">
+      <%= notice %>
+    </div>
+  <% end %>
 
-<div>
-  <%= link_to "Edit this ticket", edit_ticket_path(@ticket) %> |
-  <%= link_to "Back to tickets", tickets_path %>
+  <% if @ticket.present? %>
+    <div class="card shadow-sm p-4 bg-light">
+      <h4 class="mb-3">Ticket Details</h4>
+      <p><strong>🎟️ Ticket Number:</strong> <%= @ticket.ticket_number %></p>
+      <p><strong>🕒 Issued At:</strong> <%= @ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
 
-  <%= button_to "Destroy this ticket", @ticket, method: :delete %>
+      <hr>
+
+      <h5>Event Info</h5>
+      <p><strong>Title:</strong> <%= @registration.event.title %></p>
+      <p><strong>Venue:</strong> <%= @registration.event.venue.name %></p>
+      <p><strong>Starts At:</strong> <%= @registration.event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
+      <p><strong>Ends At:</strong> <%= @registration.event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
+    </div>
+  <% else %>
+    <div class="alert alert-warning">
+      No ticket was found.
+    </div>
+  <% end %>
+
+  <div class="text-center mt-4">
+    <%= link_to "⬅ Back to Events", filtered_events_path, class: "btn btn-outline-secondary" %>
+  </div>
 </div>

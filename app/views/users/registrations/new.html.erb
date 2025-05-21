@@ -1,0 +1,104 @@
+<p>Resource name: <%= resource_name.inspect %></p>
+
+<h2>Sign up</h2>
+
+<%= form_for(resource, as: :user, url: '/users', html: { id: "signup_form" }) do |f| %>
+  <%= render "devise/shared/error_messages", resource: resource %>
+
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name, required: true %>
+  </div>
+
+  <div class="field">
+    <%= f.label :role %><br />
+    <%= f.select :role, [['Participant', 'participant'], ['Host', 'host']],
+                { prompt: "Select Role" },
+                { required: true, id: "user_role" } %>
+  </div>
+
+  <!-- Participant Fields -->
+  <div id="participant_fields" style="display: none;">
+    <div class="field">
+      <%= f.label :interest %><br />
+      <%= f.text_area :interest %>
+    </div>
+
+    <div class="field">
+      <%= f.label :city %><br />
+      <%= f.text_field :city %>
+    </div>
+
+    <div class="field">
+      <%= f.label :birthdate %><br />
+      <%= f.date_select :birthdate, start_year: 1950, end_year: Date.today.year, include_blank: true %>
+    </div>
+  </div>
+
+  <!-- Host Fields -->
+  <div id="host_fields" style="display: none;">
+    <div class="field">
+      <%= f.label :organisation %><br />
+      <%= f.text_field :organisation %>
+    </div>
+
+    <div class="field">
+      <%= f.label :website %><br />
+      <%= f.url_field :website %>
+    </div>
+
+    <div class="field">
+      <%= f.label :number, "Contact Number" %><br />
+      <%= f.telephone_field :number, maxlength: 10, pattern: "\\d{10}" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :bio %><br />
+      <%= f.text_area :bio, rows: 3 %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= f.label :email %><br />
+    <%= f.email_field :email, required: true %>
+  </div>
+
+  <div class="field">
+    <%= f.label :password %><br />
+    <%= f.password_field :password, required: true %>
+  </div>
+
+  <div class="field">
+    <%= f.label :password_confirmation %><br />
+    <%= f.password_field :password_confirmation, required: true %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Sign up" %>
+  </div>
+<% end %>
+
+<!-- JS to toggle form fields based on role -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const roleSelect = document.getElementById("user_role");
+    const participantFields = document.getElementById("participant_fields");
+    const hostFields = document.getElementById("host_fields");
+
+    const toggleFields = () => {
+      if (roleSelect.value === "participant") {
+        participantFields.style.display = "block";
+        hostFields.style.display = "none";
+      } else if (roleSelect.value === "host") {
+        participantFields.style.display = "none";
+        hostFields.style.display = "block";
+      } else {
+        participantFields.style.display = "none";
+        hostFields.style.display = "none";
+      }
+    };
+
+    roleSelect.addEventListener("change", toggleFields);
+    toggleFields(); // Ensure fields are shown correctly on page load
+  });
+</script>

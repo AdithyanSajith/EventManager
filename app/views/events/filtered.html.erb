@@ -2,9 +2,12 @@
   <h2 class="mb-4 text-center">Events in your preferred category: <%= current_user.interest %></h2>
 
   <% @events.each do |event| %>
+    <% registration = Registration.find_by(participant_id: current_user.id, event_id: event.id) %>
+    <% ticket = registration&.ticket %>
+
     <div class="card shadow-sm mb-4">
       <div class="card-body">
-        <h4 class="card-title fw-bold">Title: <%= event.title %></h4>
+        <h4 class="card-title fw-bold">🎤 <%= event.title %></h4>
         <p><strong>Description:</strong> <%= event.description %></p>
         <p><strong>Starts at:</strong> <%= event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
         <p><strong>Ends at:</strong> <%= event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
@@ -12,11 +15,13 @@
         <p><strong>Category:</strong> <%= event.category.name %></p>
 
         <div class="d-flex gap-2 mt-3">
-          <!-- ✅ Goes to payments#new for the specific event -->
-          <%= link_to "💳 View & Pay", new_event_payment_path(event), class: "btn btn-primary" %>
+          <% if ticket.present? %>
+            <%= link_to "🎫 View Ticket", ticket_path(ticket), class: "btn btn-info" %>
+          <% else %>
+            <%= link_to "💳 View & Pay", new_event_payment_path(event), class: "btn btn-primary" %>
+          <% end %>
 
-          <!-- ✅ Goes to reviews#new with polymorphic params -->
-          <%= link_to "✍️ Write Review", new_review_path(reviewable_id: event.id, reviewable_type: "Event"), class: "btn btn-outline-secondary" %>
+          <%= link_to "✍️ Write Review", new_event_review_path(event), class: "btn btn-outline-secondary" %>
         </div>
       </div>
     </div>

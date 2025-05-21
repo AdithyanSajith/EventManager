@@ -10,6 +10,21 @@ class Event < ApplicationRecord
   # Specify source explicitly for clarity
   has_many :participants, through: :registrations, source: :user
 
+  # Validations
+  validates :title, :description, :starts_at, :ends_at, :venue_id, :category_id, presence: true
+  validate :start_and_end_dates_must_be_valid
+
+  # Custom validation to prevent past events and incorrect end times
+  def start_and_end_dates_must_be_valid
+    if starts_at.present? && starts_at < Time.current
+      errors.add(:starts_at, "must be in the future")
+    end
+
+    if ends_at.present? && starts_at.present? && ends_at <= starts_at
+      errors.add(:ends_at, "must be after the start time")
+    end
+  end
+
   # Ransack whitelisting for ActiveAdmin filters/search
   def self.ransackable_attributes(auth_object = nil)
     %w[

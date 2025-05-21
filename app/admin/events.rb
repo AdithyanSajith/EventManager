@@ -1,4 +1,7 @@
 ActiveAdmin.register Event do
+  # ✅ Permit strong parameters
+  permit_params :title, :description, :starts_at, :ends_at, :host_id, :venue_id, :category_id
+
   # Filters in the sidebar
   filter :title
   filter :starts_at

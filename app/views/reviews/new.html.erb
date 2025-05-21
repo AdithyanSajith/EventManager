@@ -1,17 +1,3 @@
-<%= form_with(model: @review, local: true) do |form| %>
-  <%= form.hidden_field :reviewable_id, value: @event.id %>
-  <%= form.hidden_field :reviewable_type, value: "Event" %>
-  <%= form.hidden_field :participant_id, value: current_user.id %>
+<h2 class="mb-4 text-center">📝 Write a Review</h2>
 
-  <div class="mb-3">
-    <%= form.label :rating %>
-    <%= form.number_field :rating, class: "form-control" %>
-  </div>
-
-  <div class="mb-3">
-    <%= form.label :comment %>
-    <%= form.text_area :comment, class: "form-control" %>
-  </div>
-
-  <%= form.submit "Submit Review", class: "btn btn-primary" %>
-<% end %>
+<%= render "form", review: @review, reviewable: @reviewable %>

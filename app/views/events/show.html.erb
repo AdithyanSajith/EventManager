@@ -10,17 +10,16 @@
       <p><strong>Category:</strong> <%= @event.category.name %></p>
 
       <% if current_user&.role == "participant" %>
-        <% if @ticket %>
+        <% registration = current_user.registrations.find_by(event: @event) rescue nil %>
+        <% ticket = registration&.ticket %>
+
+        <% if ticket.present? %>
           <div class="alert alert-success mt-4">
             <h4>Your Ticket</h4>
-            <p><strong>Ticket Number:</strong> <%= @ticket.ticket_number %></p>
-            <p><strong>Issued At:</strong> <%= @ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
+            <p><strong>Ticket Number:</strong> <%= ticket.ticket_number %></p>
+            <p><strong>Issued At:</strong> <%= ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
           </div>
-        <% elsif @payment %>
-          <div class="alert alert-warning mt-4">
-            <p>You have paid but no ticket was issued.</p>
-          </div>
-        <% elsif @registration %>
+        <% elsif registration.present? %>
           <div class="alert alert-info mt-4">
             <p>You are registered but have not completed payment.</p>
             <%= link_to "💳 Complete Payment", new_event_payment_path(@event), class: "btn btn-primary mt-2" %>
@@ -31,10 +30,10 @@
       <% end %>
 
       <% if current_user&.role == "host" && current_user == @event.host %>
-        <%= button_to "🗑️ Delete Event", event_path(@event),
-              method: :delete,
-              data: { confirm: "Are you sure?" },
-              class: "btn btn-danger mt-3" %>
+        <div class="d-flex gap-2 mt-3">
+          <%= link_to "✏️ Edit Event", edit_event_path(@event), class: "btn btn-warning" %>
+          <%= button_to "🗑️ Delete Event", event_path(@event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+        </div>
       <% end %>
     </div>
   </div>
@@ -59,7 +58,8 @@
     <% end %>
 
     <% if current_user&.role == "participant" %>
-      <%= link_to "✍️ Write a Review", new_review_path(reviewable_id: @event.id, reviewable_type: "Event"), class: "btn btn-outline-primary mt-3" %>
+      <!-- ✅ Correct path: no more review_path('new') -->
+      <%= link_to "✍️ Write a Review", new_event_review_path(@event), class: "btn btn-outline-primary mt-3" %>
     <% end %>
   </div>
 </div>

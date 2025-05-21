@@ -1,9 +1,9 @@
-<%= form_with(model: review, local: true) do |form| %>
-  <% if review.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(review.errors.count, "error") %> prohibited this review from being saved:</h2>
+<%= form_with(model: [@reviewable, @review], local: true) do |form| %>
+  <% if @review.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(@review.errors.count, "error") %> error(s) prohibited this review from being saved:</h4>
       <ul>
-        <% review.errors.full_messages.each do |message| %>
+        <% @review.errors.full_messages.each do |message| %>
           <li><%= message %></li>
         <% end %>
       </ul>
@@ -12,26 +12,15 @@
 
   <div class="mb-3">
     <%= form.label :rating %>
-    <%= form.number_field :rating, class: "form-control", min: 1, max: 5 %>
+    <%= form.number_field :rating, min: 1, max: 5, required: true, class: "form-control" %>
   </div>
 
   <div class="mb-3">
     <%= form.label :comment %>
-    <%= form.text_area :comment, class: "form-control", rows: 4 %>
+    <%= form.text_area :comment, rows: 4, required: true, class: "form-control" %>
   </div>
 
-  <div class="mb-3">
-    <%= form.label :participant_id, "Participant" %>
-    <%= form.collection_select :participant_id, Participant.all, :id, :name, prompt: "Select Participant", class: "form-control" %>
-  </div>
-
-  <div class="mb-3">
-    <%= form.label :event_id, "Event" %>
-    <%= form.collection_select :event_id, Event.all, :id, :title, prompt: "Select Event", class: "form-control" %>
-  </div>
-
-  <div class="mt-4">
-    <%= form.submit "Create Review", class: "btn btn-primary" %>
-    <%= link_to "Back to reviews", reviews_path, class: "btn btn-secondary ms-2" %>
+  <div class="mt-3">
+    <%= form.submit "Submit Review", class: "btn btn-primary" %>
   </div>
 <% end %>

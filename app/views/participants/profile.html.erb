@@ -1,0 +1,32 @@
+<h2 class="mb-4">👤 My Profile</h2>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <dl class="row">
+      <dt class="col-sm-4">Name</dt>
+      <dd class="col-sm-8"><%= @participant.name %></dd>
+
+      <dt class="col-sm-4">Email</dt>
+      <dd class="col-sm-8"><%= @participant.email %></dd>
+
+      <dt class="col-sm-4">Interest</dt>
+      <dd class="col-sm-8"><%= @participant.interest.presence || "Not provided" %></dd>
+
+      <dt class="col-sm-4">City</dt>
+      <dd class="col-sm-8"><%= @participant.city.presence || "Not provided" %></dd>
+
+      <dt class="col-sm-4">Birthdate</dt>
+      <dd class="col-sm-8">
+        <%= @participant.birthdate.present? ? @participant.birthdate.strftime('%d %B %Y') : "Not provided" %>
+      </dd>
+
+      <dt class="col-sm-4">Contact Number</dt>
+      <dd class="col-sm-8"><%= @participant.number.presence || "Not provided" %></dd>
+
+      <dt class="col-sm-4">Role</dt>
+      <dd class="col-sm-8 text-capitalize"><%= @participant.role %></dd>
+    </dl>
+
+    <%= link_to "✏️ Edit Profile", edit_user_registration_path, class: "btn btn-primary mt-3" %>
+  </div>
+</div>

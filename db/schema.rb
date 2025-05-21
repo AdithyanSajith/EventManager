@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_19_095141) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_20_115844) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -146,6 +146,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_19_095141) do
     t.datetime "issued_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "paid", default: false
     t.index ["registration_id"], name: "index_tickets_on_registration_id"
   end
 
@@ -157,12 +158,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_19_095141) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "role"
     t.string "name"
+    t.string "role"
+    t.text "interest"
     t.string "city"
     t.date "birthdate"
-    t.string "interest"
-    t.string "phone"
+    t.string "organisation"
+    t.string "website"
+    t.string "number"
+    t.text "bio"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
@@ -180,15 +184,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_19_095141) do
   end
 
   add_foreign_key "events", "categories"
-  add_foreign_key "events", "users", column: "host_id"
   add_foreign_key "events", "venues"
   add_foreign_key "managed_events", "categories"
   add_foreign_key "managed_events", "hosts"
   add_foreign_key "managed_events", "venues"
   add_foreign_key "payments", "registrations"
   add_foreign_key "registrations", "events"
-  add_foreign_key "registrations", "users", column: "participant_id"
-  add_foreign_key "reviews", "users", column: "participant_id"
   add_foreign_key "tickets", "registrations"
   add_foreign_key "venues", "hosts"
 end

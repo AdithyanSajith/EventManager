@@ -1,5 +1,3 @@
-### ✅ app/controllers/payments_controller.rb
-
 class PaymentsController < ApplicationController
   before_action :authenticate_user!
   before_action :authorize_participant!
@@ -7,23 +5,21 @@ class PaymentsController < ApplicationController
 
   def new
     @registration = Registration.find_or_create_by!(participant_id: current_user.id, event_id: @event.id)
-
-    if @registration.payment
-      redirect_to @event, notice: "You have already paid for this event."
-    else
-      @payment = @registration.build_payment
-    end
+    @payment = Payment.new  # ⬅️ This ensures form submits as POST, not PATCH
   end
 
   def create
     @registration = Registration.find_or_create_by!(participant_id: current_user.id, event_id: @event.id)
 
     if @registration.payment
-      redirect_to @event, notice: "Payment already made."
+      flash.now[:alert] = "You have already completed payment for this event."
+      @payment = @registration.payment
+      render :new, status: :unprocessable_entity
       return
     end
 
     @payment = @registration.build_payment(payment_params)
+
     if @payment.save
       unless @registration.ticket
         Ticket.create!(
@@ -32,8 +28,11 @@ class PaymentsController < ApplicationController
           issued_at: Time.current
         )
       end
-      redirect_to @event, notice: "Payment successful and ticket issued!"
+
+      flash.now[:notice] = "✅ Payment successful and ticket issued!"
+      render :new
     else
+      flash.now[:alert] = "❌ Payment failed: " + @payment.errors.full_messages.to_sentence
       render :new, status: :unprocessable_entity
     end
   end

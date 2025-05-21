@@ -1,17 +1,57 @@
 <div class="container my-5">
   <h2 class="mb-4">💳 Make a Payment for <%= @event.title %></h2>
 
-  <%= form_with model: [@event, @payment], local: true do |f| %>
-    <div class="mb-3">
-      <%= f.label :amount, "Amount" %>
-      <%= f.number_field :amount, class: "form-control", required: true %>
-    </div>
+  <% if flash[:notice] %>
+    <div class="alert alert-success"><%= flash[:notice] %></div>
+  <% end %>
 
-    <div class="mb-3">
-      <%= f.label :card_number, "Card Number" %>
-      <%= f.text_field :card_number, class: "form-control", required: true %>
-    </div>
+  <% if flash[:alert] %>
+    <div class="alert alert-danger"><%= flash[:alert] %></div>
+  <% end %>
 
-    <%= f.submit "Pay Now", class: "btn btn-success" %>
+  <% if @registration&.ticket %>
+    <!-- ✅ Ticket Already Issued -->
+    <div class="alert alert-info mt-4">
+      <h4 class="mb-2">🎫 Your Ticket</h4>
+      <p><strong>Ticket Number:</strong> <%= @registration.ticket.ticket_number %></p>
+      <p><strong>Issued At:</strong> <%= @registration.ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
+    </div>
+  <% else %>
+    <!-- ✅ Show Payment Form -->
+    <% if @payment.errors.any? %>
+      <div class="alert alert-danger">
+        <ul>
+          <% @payment.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with url: event_payments_path(@event), scope: :payment, method: :post, local: true do |f| %>
+      <div class="mb-3">
+        <%= f.label :amount, "Amount" %>
+        <%= f.number_field :amount, class: "form-control", required: true %>
+      </div>
+
+      <div class="mb-3">
+        <%= f.label :card_number, "Card Number" %>
+        <%= f.text_field :card_number, class: "form-control", required: true %>
+      </div>
+
+      <%= f.submit "Pay Now", class: "btn btn-success" %>
+    <% end %>
+  <% end %>
+
+  <% if @event.reviews.any? %>
+    <div class="mt-5">
+      <h3>🗣️ Reviews for this Event</h3>
+      <% @event.reviews.each do |review| %>
+        <div class="border rounded p-3 mb-2">
+          <strong><%= review.user.name %>:</strong>
+          <p><%= review.content %></p>
+        </div>
+      <% end %>
+    </div>
   <% end %>
 </div>

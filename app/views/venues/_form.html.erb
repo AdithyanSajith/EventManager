@@ -1,7 +1,7 @@
 <%= form_with(model: venue, local: true) do |form| %>
   <% if venue.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(venue.errors.count, "error") %> prohibited this venue from being saved:</h2>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(venue.errors.count, "error") %> prohibited this venue from being saved:</h4>
       <ul>
         <% venue.errors.full_messages.each do |msg| %>
           <li><%= msg %></li>
@@ -10,26 +10,22 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name, required: true %>
+  <div class="mb-3">
+    <%= form.label :name, class: "form-label" %>
+    <%= form.text_field :name, class: "form-control", required: true %>
   </div>
 
-  <div>
-    <%= form.label :location, style: "display: block" %>
-    <%= form.text_field :location, required: true %>
+  <div class="mb-3">
+    <%= form.label :location, class: "form-label" %>
+    <%= form.text_field :location, class: "form-control", required: true %>
   </div>
 
-  <div>
-    <%= form.label :capacity, style: "display: block" %>
-    <%= form.number_field :capacity, required: true %>
+  <div class="mb-3">
+    <%= form.label :capacity, class: "form-label" %>
+    <%= form.number_field :capacity, class: "form-control", required: true %>
   </div>
 
-  <div>
-    <%= form.hidden_field :host_id, value: current_host.id %>
-  </div>
-
-  <div style="margin-top: 12px;">
-    <%= form.submit "Create Venue" %>
+  <div class="text-center mt-4">
+    <%= form.submit venue.persisted? ? "Update Venue" : "Create Venue", class: "btn btn-success px-4 py-2" %>
   </div>
 <% end %>

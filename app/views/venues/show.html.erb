@@ -1,10 +1,5 @@
-<p style="color: green"><%= notice %></p>
-
-<%= render @venue %>
-
-<div>
-  <%= link_to "Edit this venue", edit_venue_path(@venue) %> |
-  <%= link_to "Back to venues", venues_path %>
-
-  <%= button_to "Destroy this venue", @venue, method: :delete %>
-</div>
+<h3>Reviews for this Venue</h3>
+<%= link_to "Write Review", new_venue_review_path(@venue), class: "btn btn-outline-secondary mb-2" %>
+<% @venue.reviews.each do |review| %>
+  <p><strong><%= review.participant.name %>:</strong> <%= review.comment %> (⭐ <%= review.rating %>)</p>
+<% end %>
