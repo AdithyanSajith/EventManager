@@ -1,15 +1,19 @@
 ActiveAdmin.register Venue do
-  # Allow these parameters to be assigned via forms
   permit_params :name, :address, :city, :capacity, :host_id, :location
 
-  # Filters shown in the sidebar
+  # ✅ Scopes
+  scope :all, default: true
+  scope("High Capacity") { |venues| venues.where("capacity > 500") }
+  scope("Small Halls")   { |venues| venues.where("capacity < 100") }
+
+  # ✅ Filters
   filter :name
   filter :city
   filter :capacity
-  filter :host
+  filter :host, as: :select, collection: -> { User.where(role: "host") }
   filter :created_at
 
-  # Index page table
+  # ✅ Index page
   index do
     selectable_column
     id_column
@@ -23,7 +27,7 @@ ActiveAdmin.register Venue do
     actions
   end
 
-  # Show page for a venue
+  # ✅ Show page
   show do
     attributes_table do
       row :name
@@ -37,7 +41,7 @@ ActiveAdmin.register Venue do
     end
   end
 
-  # Form for creating/editing
+  # ✅ Form
   form do |f|
     f.inputs "Venue Details" do
       f.input :name

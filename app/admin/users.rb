@@ -1,14 +1,22 @@
 if defined?(User)
   ActiveAdmin.register User do
-    # ✅ Allow mass assignment
+    # ✅ Permit strong parameters
     permit_params :email, :name, :role, :interest, :city, :birthdate,
                   :organisation, :website, :number, :bio,
                   :password, :password_confirmation
 
+    # ✅ Scopes for filtering by role
+    scope :all, default: true
+    scope("Hosts") { |users| users.where(role: "host") }
+    scope("Participants") { |users| users.where(role: "participant") }
+
     # ✅ Filters in the sidebar
     filter :name
     filter :email
-    filter :role
+    filter :role, as: :select, collection: ["host", "participant"]
+    filter :city
+    filter :interest
+    filter :birthdate
     filter :created_at
 
     # ✅ Index page

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_05_20_115844) do
+ActiveRecord::Schema[7.2].define(version: 2025_05_22_050006) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -61,19 +61,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_20_115844) do
     t.index ["venue_id"], name: "index_events_on_venue_id"
   end
 
-  create_table "hosts", force: :cascade do |t|
-    t.string "email", default: "", null: false
-    t.string "encrypted_password", default: "", null: false
-    t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_hosts_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_hosts_on_reset_password_token", unique: true
-  end
-
   create_table "managed_events", force: :cascade do |t|
     t.string "title"
     t.text "description"
@@ -87,23 +74,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_20_115844) do
     t.index ["category_id"], name: "index_managed_events_on_category_id"
     t.index ["host_id"], name: "index_managed_events_on_host_id"
     t.index ["venue_id"], name: "index_managed_events_on_venue_id"
-  end
-
-  create_table "participants", force: :cascade do |t|
-    t.string "email", default: "", null: false
-    t.string "encrypted_password", default: "", null: false
-    t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
-    t.string "name"
-    t.string "city"
-    t.date "birthdate"
-    t.string "interest"
-    t.string "phone"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_participants_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_participants_on_reset_password_token", unique: true
   end
 
   create_table "payments", force: :cascade do |t|
@@ -186,10 +156,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_05_20_115844) do
   add_foreign_key "events", "categories"
   add_foreign_key "events", "venues"
   add_foreign_key "managed_events", "categories"
-  add_foreign_key "managed_events", "hosts"
   add_foreign_key "managed_events", "venues"
   add_foreign_key "payments", "registrations"
   add_foreign_key "registrations", "events"
   add_foreign_key "tickets", "registrations"
-  add_foreign_key "venues", "hosts"
 end

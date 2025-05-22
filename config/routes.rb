@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  # Devise routes for users
+  # Devise routes for unified User model
   devise_for :users, module: 'users', controllers: {
     registrations: 'users/registrations',
     sessions: 'users/sessions',
@@ -8,40 +8,41 @@ Rails.application.routes.draw do
     unlocks: 'users/unlocks'
   }
 
-  # Devise routes for admin users
+  # Devise routes for Admin (ActiveAdmin)
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
 
-  # Root path
+  # Root page
   root "home#index"
 
-  # Dashboard and profile routes
+  # Dashboards and profile
   get "/host_dashboard", to: "hosts#dashboard", as: :host_dashboard
   get "/profile", to: "participants#profile", as: :profile
 
-  
-  get  '/choose_category',  to: 'participants#choose_category'
-  post '/set_preference',   to: 'participants#set_preference'
-  get  '/filtered_events',  to: 'events#filtered', as: :filtered_events
-  get  '/change_category',  to: 'participants#change_category', as: :change_category
-  patch '/update_interest', to: 'participants#update_interest', as: :update_interest
+  # Participant preference/category selection
+  get  '/choose_category',     to: 'participants#choose_category'
+  post '/set_preference',      to: 'participants#set_preference'
+  get  '/filtered_events',     to: 'events#filtered', as: :filtered_events
+  get  '/change_category',     to: 'participants#change_category', as: :change_category
+  patch '/update_interest',    to: 'participants#update_interest', as: :update_interest
 
-  # Nested reviews under events (new/create only)
+  # Host: view other hosts' events (read-only)
+  get '/other_events', to: 'events#other_events', as: :other_events
+
+  # Events + nested payments & reviews
   resources :events do
     resources :payments, only: [:new, :create]
     resources :reviews, only: [:new, :create]
   end
 
-  # Nested reviews under venues (new/create only)
+  # Venues + nested reviews
   resources :venues do
     resources :reviews, only: [:new, :create]
   end
 
-  # General reviews routes for index/show/edit/update/destroy
+  # General review routes
   resources :reviews, except: [:new, :create]
-
-  # Safety redirect to prevent /reviews/new from being misrouted
-  get '/reviews/new', to: redirect('/')
+  get '/reviews/new', to: redirect('/')  # Prevent manual route access
 
   # Other resources
   resources :registrations, only: [:create, :destroy]

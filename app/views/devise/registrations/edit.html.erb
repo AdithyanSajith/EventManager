@@ -1,34 +1,53 @@
+<h2>Edit Profile</h2>
+
 <%= form_for(resource, as: resource_name, url: user_registration_path, html: { method: :patch }) do |f| %>
   <%= render "devise/shared/error_messages", resource: resource %>
 
-  <div class="field">
+  <div class="field mb-3">
     <%= f.label :name %><br />
-    <%= f.text_field :name, required: true, maxlength: 50 %>
+    <%= f.text_field :name, required: true, maxlength: 50, class: "form-control" %>
   </div>
 
-  <div class="field">
-    <%= f.label :interest %><br />
-    <%= f.text_area :interest, rows: 3, maxlength: 300 %>
-  </div>
+  <% if resource.role == "participant" %>
+    <div class="field mb-3">
+      <%= f.label :interest %><br />
+      <%= f.text_area :interest, rows: 3, maxlength: 300, class: "form-control" %>
+    </div>
 
-  <div class="field">
-    <%= f.label :city %><br />
-    <%= f.text_field :city, maxlength: 100 %>
-  </div>
+    <div class="field mb-3">
+      <%= f.label :city %><br />
+      <%= f.text_field :city, maxlength: 100, class: "form-control" %>
+    </div>
 
-  <div class="field">
-    <%= f.label :birthdate %><br />
-    <%= f.date_select :birthdate, start_year: 1950, end_year: Date.today.year, include_blank: true %>
-  </div>
+    <div class="field mb-3">
+      <%= f.label :birthdate %><br />
+      <%= f.date_select :birthdate, start_year: 1950, end_year: Date.today.year, include_blank: true, class: "form-control" %>
+    </div>
+  <% elsif resource.role == "host" %>
+    <div class="field mb-3">
+      <%= f.label :organisation %><br />
+      <%= f.text_field :organisation, class: "form-control" %>
+    </div>
 
-  <div class="field">
+    <div class="field mb-3">
+      <%= f.label :website %><br />
+      <%= f.text_field :website, class: "form-control" %>
+    </div>
+
+    <div class="field mb-3">
+      <%= f.label :bio %><br />
+      <%= f.text_area :bio, rows: 3, class: "form-control" %>
+    </div>
+  <% end %>
+
+  <div class="field mb-3">
     <%= f.label :number, "Contact Number" %><br />
-    <%= f.telephone_field :number, maxlength: 10, pattern: "\\d{10}", title: "Enter a 10-digit phone number" %>
+    <%= f.telephone_field :number, maxlength: 10, pattern: "\\d{10}", title: "Enter a 10-digit phone number", class: "form-control" %>
   </div>
 
-  <div class="field">
+  <div class="field mb-3">
     <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email", required: true %>
+    <%= f.email_field :email, autofocus: true, autocomplete: "email", required: true, class: "form-control" %>
   </div>
 
   <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
@@ -37,25 +56,31 @@
     </div>
   <% end %>
 
-  <div class="field">
+  <hr>
+
+  <h4>Change Password</h4>
+
+  <div class="field mb-3">
     <%= f.label :password %> <i>(leave blank if you don't want to change it)</i><br />
-    <%= f.password_field :password, autocomplete: "new-password" %>
+    <%= f.password_field :password, autocomplete: "new-password", class: "form-control" %>
     <% if @minimum_password_length %>
-      <em><%= @minimum_password_length %> characters minimum</em>
+      <small class="form-text text-muted"><%= @minimum_password_length %> characters minimum</small>
     <% end %>
   </div>
 
-  <div class="field">
+  <div class="field mb-3">
     <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+    <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "form-control" %>
   </div>
 
-  <div class="field">
+  <div class="field mb-3">
     <%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i><br />
-    <%= f.password_field :current_password, autocomplete: "current-password", required: true %>
+    <%= f.password_field :current_password, autocomplete: "current-password", required: true, class: "form-control" %>
   </div>
 
   <div class="actions">
-    <%= f.submit "Update", class: "btn btn-primary mt-2" %>
+    <%= f.submit "Update", class: "btn btn-success" %>
   </div>
 <% end %>
+
+<%= link_to "Back", root_path, class: "btn btn-secondary mt-3" %>

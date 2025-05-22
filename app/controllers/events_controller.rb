@@ -1,17 +1,20 @@
 class EventsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_event, only: [:show, :edit, :update, :destroy]
-  before_action :authorize_host!, only: [:new, :create, :edit, :update, :destroy, :index]
+  before_action :authorize_host!, only: [:new, :create, :edit, :update, :destroy, :index, :other_events]
   before_action :authorize_participant!, only: [:filtered]
 
+  # Show only current host's events
   def index
     @events = current_user.events.includes(:venue, :category)
   end
 
+  # Form to create new event
   def new
     @event = Event.new
   end
 
+  # Handle creation logic
   def create
     @event = current_user.events.build(event_params)
     if @event.save
@@ -21,26 +24,46 @@ class EventsController < ApplicationController
     end
   end
 
+  # View event details with logic per role
   def show
-    if current_user.role == "participant"
-      @registration = current_user.registrations.find_by(event_id: @event.id)
-      @payment = @registration&.payment
-      @ticket = @registration&.ticket
-    elsif current_user.role == "host" && current_user == @event.host
+  if current_user.role == "participant"
+    # Show registration/payment/ticket info for the participant
+    @registration = current_user.registrations.find_by(event_id: @event.id)
+    @payment = @registration&.payment
+    @ticket = @registration&.ticket
+
+  elsif current_user.role == "host"
+    if current_user == @event.host
+      # If it's their own event, show full registration data
       @registrations = @event.registrations.includes(:user)
     else
-      redirect_to root_path, alert: "You are not authorized to view this event."
+      # If another host's event, allow view-only access
+      # No registrations shown
     end
-  end
 
+  else
+    # Default fallback for unknown roles
+    redirect_to root_path, alert: "You are not authorized to view this event."
+  end
+end
+
+
+  # Show only events matching participant's interest
   def filtered
     @events = Event.where(category_id: current_user.interest)
   end
 
+  # ✅ Show events not created by current host
+  def other_events
+    @events = Event.where.not(host_id: current_user.id)
+  end
+
+  # Edit form
   def edit
     redirect_to events_path, alert: "You can only edit your own events." unless current_user == @event.host
   end
 
+  # Update logic
   def update
     if current_user == @event.host
       if @event.update(event_params)
@@ -53,6 +76,7 @@ class EventsController < ApplicationController
     end
   end
 
+  # Delete event
   def destroy
     if current_user == @event.host
       @event.destroy
@@ -64,18 +88,22 @@ class EventsController < ApplicationController
 
   private
 
+  # Finds event by ID param
   def set_event
     @event = Event.find(params[:id])
   end
 
+  # Strong parameters for event creation/update
   def event_params
     params.require(:event).permit(:title, :description, :starts_at, :ends_at, :category_id, :venue_id)
   end
 
+  # Allow only hosts to access specific actions
   def authorize_host!
     redirect_to root_path, alert: "Only hosts can access this page." unless current_user.role == "host"
   end
 
+  # Restrict filtered list to participants
   def authorize_participant!
     redirect_to root_path, alert: "Only participants can access this section." unless current_user.role == "participant"
   end

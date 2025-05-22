@@ -36,7 +36,11 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <% if user_signed_in? %>
-              <% if current_user.role == "participant" %>
+              <% if current_user.role == "host" %>
+                <li class="nav-item">
+                  <%= link_to "View Other Events", other_events_path, class: "nav-link" %>
+                </li>
+              <% elsif current_user.role == "participant" %>
                 <li class="nav-item">
                   <%= link_to "Change Category", change_category_path, class: "nav-link" %>
                 </li>

@@ -1,13 +1,21 @@
 ActiveAdmin.register Event do
-  # ✅ Permit strong parameters
   permit_params :title, :description, :starts_at, :ends_at, :host_id, :venue_id, :category_id
 
-  # Filters in the sidebar
+  # ✅ Scopes
+  scope :all, default: true
+  scope("Upcoming") { |events| events.where("starts_at >= ?", Time.current) }
+  scope("Past")     { |events| events.where("ends_at < ?", Time.current) }
+
+  # ✅ Filters
   filter :title
   filter :starts_at
-  filter :host, as: :select, collection: -> { User.where(role: 'host') }
+  filter :ends_at
+  filter :host, as: :select, collection: -> { User.where(role: "host") }
+  filter :category
+  filter :venue
+  filter :created_at
 
-  # Index page customization
+  # ✅ Index table
   index do
     selectable_column
     id_column
@@ -18,7 +26,7 @@ ActiveAdmin.register Event do
     actions
   end
 
-  # Show page customization
+  # ✅ Show view
   show do
     attributes_table do
       row :id
