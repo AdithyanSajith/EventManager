@@ -48,8 +48,8 @@
       <h3>🗣️ Reviews for this Event</h3>
       <% @event.reviews.each do |review| %>
         <div class="border rounded p-3 mb-2">
-          <strong><%= review.user.name %>:</strong>
-          <p><%= review.content %></p>
+          <strong><%= review.participant&.name || "Anonymous" %>:</strong>
+          <p><%= review.comment %></p>
         </div>
       <% end %>
     </div>

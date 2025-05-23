@@ -17,32 +17,32 @@ Rails.application.routes.draw do
 
   # Dashboards and profile
   get "/host_dashboard", to: "hosts#dashboard", as: :host_dashboard
-  get "/profile", to: "participants#profile", as: :profile
+  get "/profile",        to: "participants#profile", as: :profile
 
   # Participant preference/category selection
-  get  '/choose_category',     to: 'participants#choose_category'
-  post '/set_preference',      to: 'participants#set_preference'
-  get  '/filtered_events',     to: 'events#filtered', as: :filtered_events
-  get  '/change_category',     to: 'participants#change_category', as: :change_category
-  patch '/update_interest',    to: 'participants#update_interest', as: :update_interest
+  get   '/choose_category',  to: 'participants#choose_category', as: :choose_category
+  post  '/set_preference',   to: 'participants#set_preference',  as: :set_preference
+  get   '/change_category',  to: 'participants#change_category', as: :change_category
+  patch '/update_interest',  to: 'participants#update_interest', as: :update_interest
+  get   '/filtered_events',  to: 'events#filtered',              as: :filtered_events
 
   # Host: view other hosts' events (read-only)
   get '/other_events', to: 'events#other_events', as: :other_events
 
-  # Events + nested payments & reviews
+  # Events with nested payments and reviews
   resources :events do
     resources :payments, only: [:new, :create]
-    resources :reviews, only: [:new, :create]
+    resources :reviews,  only: [:new, :create]
   end
 
-  # Venues + nested reviews
+  # Venues with nested reviews
   resources :venues do
     resources :reviews, only: [:new, :create]
   end
 
   # General review routes
   resources :reviews, except: [:new, :create]
-  get '/reviews/new', to: redirect('/')  # Prevent manual route access
+  get '/reviews/new', to: redirect('/')  # Prevent direct access to generic new review path
 
   # Other resources
   resources :registrations, only: [:create, :destroy]

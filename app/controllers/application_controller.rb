@@ -9,7 +9,8 @@ class ApplicationController < ActionController::Base
     elsif resource.respond_to?(:role)
       case resource.role
       when 'participant'
-        resource.interest.blank? ? choose_category_path : filtered_events_path
+        participant = resource.userable
+        participant&.interest.blank? ? choose_category_path : filtered_events_path
       when 'host'
         host_dashboard_path
       else
@@ -20,10 +21,18 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # ✅ Handles redirection immediately after sign-up
+  def after_sign_up_path_for(resource)
+    after_sign_in_path_for(resource)
+  end
+
   protected
 
   def configure_permitted_parameters
-    added_attrs = [:name, :role, :interest, :city, :birthdate, :number, :email, :password, :password_confirmation]
+    added_attrs = [
+      :name, :role, :interest, :city, :birthdate, :number,
+      :email, :password, :password_confirmation
+    ]
     devise_parameter_sanitizer.permit(:sign_up, keys: added_attrs)
     devise_parameter_sanitizer.permit(:account_update, keys: added_attrs)
   end

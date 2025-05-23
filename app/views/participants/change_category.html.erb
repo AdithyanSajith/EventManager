@@ -35,10 +35,10 @@
       <h2 class="text-center mb-4">Change Category</h2>
       <p class="text-center">Please select a new category for your interest:</p>
       
-      <%= form_with url: update_interest_path, method: :patch do |form| %>
+      <%= form_with url: update_interest_path, method: :patch, local: true do |form| %>
         <div class="mb-3">
           <%= form.label :interest, "Choose a Category", class: "form-label" %>
-          <%= form.collection_select :interest, @categories, :id, :name, prompt: "Select Category", class: "form-control" %>
+          <%= form.collection_select :interest, @categories, :id, :name, prompt: "Select Category", class: "form-select" %>
         </div>
         <%= form.submit "Update Interest", class: "btn btn-custom w-100" %>
       <% end %>

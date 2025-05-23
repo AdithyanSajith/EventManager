@@ -1,17 +1,15 @@
 class Venue < ApplicationRecord
-  belongs_to :host, class_name: "User"
+  belongs_to :host
   has_many :events, dependent: :nullify
   has_many :reviews, as: :reviewable, dependent: :destroy
 
   validates :name, :location, presence: true
 
-  # ✅ Required by ActiveAdmin (Ransack) to allow filtering/searching
-  def self.ransackable_attributes(auth_object = nil)
+  def self.ransackable_attributes(_auth = nil)
     %w[id name address city capacity location host_id created_at updated_at]
   end
 
-  # ✅ Optional: allow filtering on associations
-  def self.ransackable_associations(auth_object = nil)
+  def self.ransackable_associations(_auth = nil)
     %w[host events reviews]
   end
 end

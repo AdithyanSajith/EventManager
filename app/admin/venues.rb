@@ -4,7 +4,7 @@ ActiveAdmin.register Venue do
   # ✅ Scopes
   scope :all, default: true
   scope("High Capacity") { |venues| venues.where("capacity > 500") }
-  scope("Small Halls")   { |venues| venues.where("capacity < 100") }
+  scope("Smaller Halls")   { |venues| venues.where("capacity < 100") }
 
   # ✅ Filters
   filter :name

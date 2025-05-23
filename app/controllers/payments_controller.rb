@@ -4,12 +4,30 @@ class PaymentsController < ApplicationController
   before_action :set_event
 
   def new
-    @registration = Registration.find_or_create_by!(participant_id: current_user.id, event_id: @event.id)
-    @payment = Payment.new  # ⬅️ This ensures form submits as POST, not PATCH
+    participant = current_user.userable
+    unless participant
+      redirect_to root_path, alert: "Participant profile not found. Please contact support."
+      return
+    end
+
+    @registration = Registration.find_or_create_by!(
+      participant_id: participant.id,
+      event_id: @event.id
+    )
+    @payment = Payment.new
   end
 
   def create
-    @registration = Registration.find_or_create_by!(participant_id: current_user.id, event_id: @event.id)
+    participant = current_user.userable
+    unless participant
+      redirect_to root_path, alert: "Participant profile not found. Please contact support."
+      return
+    end
+
+    @registration = Registration.find_or_create_by!(
+      participant_id: participant.id,
+      event_id: @event.id
+    )
 
     if @registration.payment
       flash.now[:alert] = "You have already completed payment for this event."
@@ -48,6 +66,8 @@ class PaymentsController < ApplicationController
   end
 
   def authorize_participant!
-    redirect_to root_path, alert: "Only participants can make payments." unless current_user.role == "participant"
+    unless current_user.role == "participant"
+      redirect_to root_path, alert: "Only participants can make payments."
+    end
   end
 end

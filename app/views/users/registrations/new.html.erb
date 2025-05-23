@@ -1,8 +1,11 @@
-<p>Resource name: <%= resource_name.inspect %></p>
+<%# app/views/users/registrations/new.html.erb %>
+<% resource ||= User.new %>
+<% resource_name = :user %>
+<% devise_mapping ||= Devise.mappings[:user] %>
 
 <h2>Sign up</h2>
 
-<%= form_for(resource, as: :user, url: '/users', html: { id: "signup_form" }) do |f| %>
+<%= form_for(resource, as: resource_name, url: user_registration_path, html: { id: "signup_form" }) do |f| %>
   <%= render "devise/shared/error_messages", resource: resource %>
 
   <div class="field">
@@ -13,8 +16,7 @@
   <div class="field">
     <%= f.label :role %><br />
     <%= f.select :role, [['Participant', 'participant'], ['Host', 'host']],
-                { prompt: "Select Role" },
-                { required: true, id: "user_role" } %>
+                 { prompt: "Select Role" }, { required: true, id: "user_role" } %>
   </div>
 
   <!-- Participant Fields -->
@@ -31,7 +33,7 @@
 
     <div class="field">
       <%= f.label :birthdate %><br />
-      <%= f.date_select :birthdate, start_year: 1950, end_year: Date.today.year, include_blank: true %>
+      <%= f.date_field :birthdate %>
     </div>
   </div>
 
@@ -78,27 +80,24 @@
   </div>
 <% end %>
 
-<!-- JS to toggle form fields based on role -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const roleSelect = document.getElementById("user_role");
     const participantFields = document.getElementById("participant_fields");
     const hostFields = document.getElementById("host_fields");
 
-    const toggleFields = () => {
+    function toggleFields() {
+      participantFields.style.display = "none";
+      hostFields.style.display = "none";
+
       if (roleSelect.value === "participant") {
         participantFields.style.display = "block";
-        hostFields.style.display = "none";
       } else if (roleSelect.value === "host") {
-        participantFields.style.display = "none";
         hostFields.style.display = "block";
-      } else {
-        participantFields.style.display = "none";
-        hostFields.style.display = "none";
       }
-    };
+    }
 
     roleSelect.addEventListener("change", toggleFields);
-    toggleFields(); // Ensure fields are shown correctly on page load
+    toggleFields();
   });
 </script>
