@@ -1,37 +1,60 @@
-<div class="container my-5">
-  <h2 class="mb-4 text-center">
-    Events in your preferred category: <%= Category.find_by(id: current_user.interest)&.name || "None" %>
-  </h2>
+<% if @events.any? %>
+  <% @events.each do |event| %>
+    <% participant = current_user.userable %>
+    <% registration = participant ? Registration.find_by(participant_id: participant.id, event_id: event.id) : nil %>
+    <% ticket = registration&.ticket %>
+    <% payment = registration&.payment %>
+    <% reviews = event.reviews.includes(:participant).order(created_at: :desc) %>
 
-  <% if @events.any? %>
-    <% @events.each do |event| %>
-      <% registration = Registration.find_by(participant_id: current_user.id, event_id: event.id) %>
-      <% ticket = registration&.ticket %>
+    <div class="card shadow-sm mb-4">
+      <div class="card-body" data-controller="payment" data-payment-event-id="<%= event.id %>">
+        <h5 class="card-title"><%= event.title %></h5>
+        <p class="card-text"><%= event.description %></p>
 
-      <div class="card shadow-sm mb-4">
-        <div class="card-body">
-          <h4 class="card-title fw-bold">🎤 <%= event.title %></h4>
-          <p><strong>Description:</strong> <%= event.description %></p>
-          <p><strong>Starts at:</strong> <%= event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
-          <p><strong>Ends at:</strong> <%= event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
-          <p><strong>Venue:</strong> <%= event.venue.name %></p>
-          <p><strong>Category:</strong> <%= event.category.name %></p>
+        <p class="card-text">
+          <strong>Starts At:</strong> <%= event.starts_at.strftime("%B %d, %Y %I:%M %p") %><br>
+          <strong>Ends At:</strong> <%= event.ends_at.strftime("%B %d, %Y %I:%M %p") %>
+        </p>
 
-          <div class="d-flex gap-2 mt-3">
-            <% if ticket.present? %>
-              <%= link_to "🎫 View Ticket", ticket_path(ticket), class: "btn btn-info" %>
-            <% else %>
-              <%= link_to "💳 View & Pay", new_event_payment_path(event), class: "btn btn-primary" %>
-            <% end %>
+        <% if event.venue.present? %>
+          <p class="card-text"><strong>Location:</strong> <%= event.venue.name %></p>
+        <% end %>
 
-            <%= link_to "✍️ Write Review", new_event_review_path(event), class: "btn btn-outline-secondary" %>
-          </div>
+        <% if ticket.present? %>
+          <p class="text-success">🎟️ Ticket ID: <%= ticket.id %></p>
+          <%= link_to "View Ticket", ticket_path(ticket), class: "btn btn-outline-success btn-sm me-2" %>
+          <%= link_to "Add Review", new_event_review_path(event), class: "btn btn-outline-primary btn-sm" %>
+        <% else %>
+          <!-- Payment button managed by Stimulus -->
+          <button data-payment-target="button" data-action="click->payment#pay" class="btn btn-warning btn-sm" style="display:none;">
+            Pay Now
+          </button>
+        <% end %>
+
+        <!-- Async status from Stimulus -->
+        <div class="mt-2">
+          <span data-payment-target="status" class="badge bg-info-subtle text-dark">
+            Checking status...
+          </span>
         </div>
+
+        <% if reviews.any? %>
+          <hr>
+          <h6 class="mt-4">Reviews:</h6>
+          <% reviews.each do |review| %>
+            <div class="border rounded p-2 mb-2 bg-white">
+              <strong><%= review.participant&.name || "Anonymous" %></strong> -
+              <span class="text-muted"><%= review.created_at.strftime("%d %b %Y") %></span><br>
+              ⭐ <strong><%= review.rating %>/5</strong><br>
+              <%= review.comment %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-muted mt-3">No reviews yet.</p>
+        <% end %>
       </div>
-    <% end %>
-  <% else %>
-    <div class="alert alert-info text-center">
-      No events found in your preferred category.
     </div>
   <% end %>
-</div>
+<% else %>
+  <p>No events found.</p>
+<% end %>

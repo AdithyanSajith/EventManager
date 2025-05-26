@@ -27,10 +27,10 @@ class EventsController < ApplicationController
   # View event details with logic per role
   def show
     if current_user.role == "participant"
-      @registration = current_user.registrations.find_by(event_id: @event.id)
+      @registration = current_user.userable.registrations.find_by(event_id: @event.id)
       @payment = @registration&.payment
       @ticket = @registration&.ticket
-
+        
     elsif current_user.role == "host"
       if current_user.userable == @event.host
         @registrations = @event.registrations.includes(:user)
@@ -44,8 +44,8 @@ class EventsController < ApplicationController
 
   # Show events matching participant's interest
   def filtered
-    @events = Event.where(category_id: current_user.interest)
-  end
+  @events = Event.where(category_id: current_user.interest).includes(:venue, :reviews)
+end
 
   # Show events not created by current host
   def other_events

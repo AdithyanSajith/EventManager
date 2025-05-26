@@ -7,7 +7,7 @@ class TicketsController < ApplicationController
     @registration = @ticket.registration
 
     # Ensure the ticket belongs to the logged-in participant
-    if @registration.participant_id != current_user.id
+    if @registration.participant_id != current_user.userable_id
       redirect_to filtered_events_path, alert: "You are not authorized to view this ticket."
     end
   rescue ActiveRecord::RecordNotFound

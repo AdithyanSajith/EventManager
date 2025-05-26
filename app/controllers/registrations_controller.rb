@@ -1,20 +1,25 @@
-module Users
-  class RegistrationsController < Devise::RegistrationsController
-    before_action :configure_permitted_parameters
+class RegistrationsController < ApplicationController
+  before_action :authenticate_user!
+  before_action :set_event
 
-    protected
+  def new
+    @registration = Registration.new
+  end
 
-    def configure_permitted_parameters
-      devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :role])
-      devise_parameter_sanitizer.permit(:account_update, keys: [:name, :role])
+  def create
+    @registration = @event.registrations.new(participant_id: current_user.userable&.id)
+
+    if @registration.save
+      redirect_to filtered_events_path, notice: "You have successfully registered for this event."
+    else
+      flash.now[:alert] = "Registration failed."
+      render :new
     end
+  end
 
-    def after_sign_up_path_for(resource)
-      if resource.role == "host"
-        host_dashboard_path
-      else
-        choose_category_path
-      end
-    end
+  private
+
+  def set_event
+    @event = Event.find(params[:event_id])
   end
 end

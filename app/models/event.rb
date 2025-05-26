@@ -17,11 +17,11 @@ class Event < ApplicationRecord
     end
   end
 
-  def self.ransackable_attributes(_auth = nil)
+  def self.ransackable_attributes(_auth = nil) #Filter in same table
     %w[id title description starts_at ends_at created_at updated_at host_id venue_id category_id]
   end
 
-  def self.ransackable_associations(_auth = nil)
+  def self.ransackable_associations(_auth = nil) # Filter table through joins
     %w[host venue category participants registrations reviews]
   end
 end

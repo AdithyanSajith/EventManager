@@ -1,7 +1,7 @@
 class ReviewsController < ApplicationController
   before_action :set_review, only: %i[show edit update destroy]
   before_action :authorize_participant!
-  before_action :set_reviewable, only: %i[new create]
+  before_action :set_reviewable, only: %i[new create] # find target of review
 
   def index
     @reviews = Review.all.includes(:participant, :reviewable)
@@ -12,13 +12,13 @@ class ReviewsController < ApplicationController
   end
 
   def new
-    @review = Review.new(reviewable: @reviewable, participant: current_user)
+    @review = Review.new(reviewable: @reviewable, participant: current_user.userable)
   end
 
   def create
     @review = Review.new(review_params)
     @review.reviewable = @reviewable
-    @review.participant = current_user
+    @review.participant = current_user.userable
 
     if @review.save
       redirect_to @reviewable, notice: "Review submitted!"

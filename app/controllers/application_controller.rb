@@ -1,7 +1,16 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
+  before_action :configure_permitted_parameters, if: :devise_controller? # Allow extra params
+  before_action :store_user_location!, if: :storable_location? #Valid locations redirections
 
-  before_action :configure_permitted_parameters, if: :devise_controller?
+  # ✅ Only skip CSRF for Devise logout in development
+  if Rails.env.development?
+    skip_before_action :verify_authenticity_token, if: -> {
+      devise_controller? &&
+      params[:controller] == "users/sessions" &&
+      params[:action] == "destroy"
+    }
+  end
 
   def after_sign_in_path_for(resource)
     if resource.is_a?(AdminUser)
@@ -21,7 +30,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # ✅ Handles redirection immediately after sign-up
   def after_sign_up_path_for(resource)
     after_sign_in_path_for(resource)
   end
@@ -29,18 +37,23 @@ class ApplicationController < ActionController::Base
   protected
 
   def configure_permitted_parameters
-    added_attrs = [
-      :name, :role, :interest, :city, :birthdate, :number,
-      :email, :password, :password_confirmation
-    ]
+    added_attrs = [:name, :role, :interest, :city, :birthdate, :number, :email, :password, :password_confirmation]
     devise_parameter_sanitizer.permit(:sign_up, keys: added_attrs)
     devise_parameter_sanitizer.permit(:account_update, keys: added_attrs)
   end
 
   def authenticate_host!
     authenticate_user!
-    unless current_user.role == 'host'
-      redirect_to root_path, alert: "Only hosts can access this section."
-    end
+    redirect_to root_path, alert: "Only hosts can access this section." unless current_user.role == 'host'
+  end
+
+  private
+
+  def storable_location?
+    request.get? && is_navigational_format? && !devise_controller? && !request.xhr?
+  end
+
+  def store_user_location!
+    store_location_for(:user, request.fullpath)
   end
 end

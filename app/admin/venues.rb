@@ -4,13 +4,13 @@ ActiveAdmin.register Venue do
   # ✅ Scopes
   scope :all, default: true
   scope("High Capacity") { |venues| venues.where("capacity > 500") }
-  scope("Smaller Halls")   { |venues| venues.where("capacity < 100") }
+  scope("Smaller Halls") { |venues| venues.where("capacity < 100") }
 
   # ✅ Filters
   filter :name
   filter :city
   filter :capacity
-  filter :host, as: :select, collection: -> { User.where(role: "host") }
+  filter :host, as: :select, collection: -> { Host.all.map { |host| [host.organisation, host.id] } }
   filter :created_at
 
   # ✅ Index page
@@ -21,7 +21,7 @@ ActiveAdmin.register Venue do
     column :address
     column :city
     column :capacity
-    column("Host") { |venue| venue.host.name if venue.host }
+    column("Host") { |venue| venue.host&.organisation }
     column :location
     column :created_at
     actions
@@ -34,7 +34,7 @@ ActiveAdmin.register Venue do
       row :address
       row :city
       row :capacity
-      row("Host") { |venue| venue.host.name if venue.host }
+      row("Host") { |venue| venue.host&.organisation }
       row :location
       row :created_at
       row :updated_at
@@ -49,7 +49,7 @@ ActiveAdmin.register Venue do
       f.input :city
       f.input :capacity
       f.input :location
-      f.input :host, as: :select, collection: User.where(role: "host").map { |u| [u.name, u.id] }
+      f.input :host, as: :select, collection: Host.all.map { |h| [h.organisation, h.id] }
     end
     f.actions
   end

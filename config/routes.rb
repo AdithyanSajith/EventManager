@@ -29,10 +29,11 @@ Rails.application.routes.draw do
   # Host: view other hosts' events (read-only)
   get '/other_events', to: 'events#other_events', as: :other_events
 
-  # Events with nested payments and reviews
+  # Events with nested payments, reviews, and registrations ✅
   resources :events do
     resources :payments, only: [:new, :create]
     resources :reviews,  only: [:new, :create]
+    resources :registrations, only: [:new, :create]
   end
 
   # Venues with nested reviews
@@ -48,4 +49,20 @@ Rails.application.routes.draw do
   resources :registrations, only: [:create, :destroy]
   resources :categories
   resources :tickets, only: [:show]
+
+  # -----------------------------
+  # ✅ API NAMESPACE FOR FRONTEND
+  # -----------------------------
+  namespace :api do
+    namespace :v1 do
+      resources :events, only: [] do
+        resources :reviews, only: [:index, :create]
+        get 'registration_status', to: 'registrations#status'
+        post 'payment', to: 'payments#create'
+      end
+
+      resources :tickets, only: [:show]
+      resource :profile, only: [:show, :update]
+    end
+  end
 end

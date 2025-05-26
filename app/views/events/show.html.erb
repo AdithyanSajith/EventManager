@@ -10,7 +10,7 @@
       <p><strong>Category:</strong> <%= @event.category.name %></p>
 
       <% if current_user&.role == "participant" %>
-        <% registration = current_user.registrations.find_by(event: @event) rescue nil %>
+        <% registration = current_user.userable&.registrations&.find_by(event_id: @event.id) %>
         <% ticket = registration&.ticket %>
 
         <% if ticket.present? %>
@@ -29,10 +29,10 @@
         <% end %>
       <% end %>
 
-      <% if current_user&.role == "host" && current_user == @event.host %>
-        <div class="d-flex gap-2 mt-3">
-          <%= link_to "✏️ Edit Event", edit_event_path(@event), class: "btn btn-warning" %>
-          <%= button_to "🗑️ Delete Event", event_path(@event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+      <% if current_user&.role == "host" && current_user.userable == @event.host %>
+        <div class="d-flex gap-2 mt-4">
+          <%= link_to "✏️ Edit Event", edit_event_path(@event), class: "btn btn-outline-warning btn-sm" %>
+          <%= button_to "🗑️ Delete Event", event_path(@event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-outline-danger btn-sm" %>
         </div>
       <% end %>
     </div>
@@ -49,7 +49,7 @@
           <div class="card-body">
             <h5 class="card-title mb-2">⭐ <%= review.rating %>/5</h5>
             <p class="card-text"><%= review.comment %></p>
-            <p class="text-muted mb-0">By: <%= review.participant.name if review.participant %></p>
+            <p class="text-muted mb-0">By: <%= review.participant&.name || "Anonymous" %></p>
           </div>
         </div>
       <% end %>
@@ -58,7 +58,6 @@
     <% end %>
 
     <% if current_user&.role == "participant" %>
-      <!-- ✅ Correct path: no more review_path('new') -->
       <%= link_to "✍️ Write a Review", new_event_review_path(@event), class: "btn btn-outline-primary mt-3" %>
     <% end %>
   </div>
