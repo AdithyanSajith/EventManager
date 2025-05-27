@@ -9,8 +9,8 @@
       <p><strong>Venue:</strong> <%= @event.venue.name %></p>
       <p><strong>Category:</strong> <%= @event.category.name %></p>
 
-      <% if current_user&.role == "participant" %>
-        <% registration = current_user.userable&.registrations&.find_by(event_id: @event.id) %>
+      <% if current_resource_owner&.role == "participant" %>
+        <% registration = current_resource_owner.userable&.registrations&.find_by(event_id: @event.id) %>
         <% ticket = registration&.ticket %>
 
         <% if ticket.present? %>
@@ -29,7 +29,7 @@
         <% end %>
       <% end %>
 
-      <% if current_user&.role == "host" && current_user.userable == @event.host %>
+      <% if current_resource_owner&.role == "host" && current_resource_owner.userable == @event.host %>
         <div class="d-flex gap-2 mt-4">
           <%= link_to "✏️ Edit Event", edit_event_path(@event), class: "btn btn-outline-warning btn-sm" %>
           <%= button_to "🗑️ Delete Event", event_path(@event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-outline-danger btn-sm" %>
@@ -57,7 +57,7 @@
       <p class="text-muted">No reviews yet for this event.</p>
     <% end %>
 
-    <% if current_user&.role == "participant" %>
+    <% if current_resource_owner&.role == "participant" %>
       <%= link_to "✍️ Write a Review", new_event_review_path(@event), class: "btn btn-outline-primary mt-3" %>
     <% end %>
   </div>

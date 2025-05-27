@@ -12,13 +12,13 @@ class ReviewsController < ApplicationController
   end
 
   def new
-    @review = Review.new(reviewable: @reviewable, participant: current_user.userable)
+    @review = Review.new(reviewable: @reviewable, participant: current_resource_owner.userable)
   end
 
   def create
     @review = Review.new(review_params)
     @review.reviewable = @reviewable
-    @review.participant = current_user.userable
+    @review.participant = current_resource_owner.userable
 
     if @review.save
       redirect_to @reviewable, notice: "Review submitted!"
@@ -70,6 +70,6 @@ class ReviewsController < ApplicationController
   end
 
   def authorize_participant!
-    redirect_to root_path, alert: "Only participants can review." unless current_user&.role == "participant"
+    redirect_to root_path, alert: "Only participants can review." unless current_resource_owner&.role == "participant"
   end
 end

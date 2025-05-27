@@ -1,10 +1,10 @@
 class PaymentsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :doorkeeper_authorize!
   before_action :authorize_participant!
   before_action :set_event
 
   def new
-    participant = current_user.userable
+    participant = current_resource_owner.userable
     unless participant
       redirect_to root_path, alert: "Participant profile not found. Please contact support."
       return
@@ -18,7 +18,7 @@ class PaymentsController < ApplicationController
   end
 
   def create
-    participant = current_user.userable
+    participant = current_resource_owner.userable
     unless participant
       redirect_to root_path, alert: "Participant profile not found. Please contact support."
       return
@@ -66,7 +66,7 @@ class PaymentsController < ApplicationController
   end
 
   def authorize_participant!
-    unless current_user.role == "participant"
+    unless current_resource_owner.role == "participant"
       redirect_to root_path, alert: "Only participants can make payments."
     end
   end

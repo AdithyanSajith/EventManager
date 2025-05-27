@@ -15,7 +15,7 @@
 
             <%= link_to "🔍 View Details", event_path(event), class: "btn btn-outline-primary w-100 mb-2" %>
 
-            <% if user_signed_in? && current_user.role == "host" %>
+            <% if user_signed_in? && current_resource_owner.role == "host" %>
               <%= button_to "🗑️ Delete", event_path(event),
                     method: :delete,
                     data: { confirm: "Are you sure you want to delete this event?" },
@@ -27,7 +27,7 @@
     <% end %>
   </div>
 
-  <% if user_signed_in? && current_user.role == "host" %>
+  <% if user_signed_in? && current_resource_owner.role == "host" %>
     <div class="text-center mt-5">
       <%= link_to "➕ Create New Event", new_event_path, class: "btn btn-success btn-lg" %>
     </div>

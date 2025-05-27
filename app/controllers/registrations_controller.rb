@@ -1,5 +1,5 @@
 class RegistrationsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :doorkeeper_authorize!
   before_action :set_event
 
   def new
@@ -7,7 +7,7 @@ class RegistrationsController < ApplicationController
   end
 
   def create
-    @registration = @event.registrations.new(participant_id: current_user.userable&.id)
+    @registration = @event.registrations.new(participant_id: current_resource_owner.userable&.id)
 
     if @registration.save
       redirect_to filtered_events_path, notice: "You have successfully registered for this event."

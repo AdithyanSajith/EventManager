@@ -1,5 +1,5 @@
 class ParticipantsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :doorkeeper_authorize!
   before_action :authorize_participant!
 
   def choose_category
@@ -7,7 +7,7 @@ class ParticipantsController < ApplicationController
   end
 
   def set_preference
-    if current_user.update(interest: params[:interest])
+    if current_resource_owner.update(interest: params[:interest])
       redirect_to filtered_events_path, notice: "Category preference saved!"
     else
       redirect_to choose_category_path, alert: "Something went wrong."
@@ -19,7 +19,7 @@ class ParticipantsController < ApplicationController
   end
 
   def update_interest
-    if current_user.update(interest: params[:interest])
+    if current_resource_owner.update(interest: params[:interest])
       redirect_to filtered_events_path, notice: "Interest updated!"
     else
       redirect_to change_category_path, alert: "Update failed."
@@ -27,13 +27,13 @@ class ParticipantsController < ApplicationController
   end
 
   def profile
-    @participant = current_user
+    @participant = current_resource_owner
   end
 
   private
 
   def authorize_participant!
-    unless current_user.role == "participant"
+    unless current_resource_owner.role == "participant"
       redirect_to root_path, alert: "Only participants can access this page."
     end
   end

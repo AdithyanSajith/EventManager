@@ -1,10 +1,10 @@
 class VenuesController < ApplicationController
-  before_action :authenticate_user!
+  before_action :doorkeeper_authorize!
   before_action :ensure_host!
   before_action :set_venue, only: %i[show edit update destroy]
 
   def index
-    @venues = current_user.venues
+    @venues = current_resource_owner.venues
   end
 
   def show
@@ -18,7 +18,7 @@ class VenuesController < ApplicationController
   end
 
   def create
-    @venue = current_user.venues.build(venue_params)
+    @venue = current_resource_owner.venues.build(venue_params)
 
     if @venue.save
       redirect_to venues_path, notice: "Venue was successfully created."
@@ -43,7 +43,7 @@ class VenuesController < ApplicationController
   private
 
   def set_venue
-    @venue = current_user.venues.find(params[:id])
+    @venue = current_resource_owner.venues.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to venues_path, alert: "Venue not found."
   end
@@ -53,6 +53,6 @@ class VenuesController < ApplicationController
   end
 
   def ensure_host!
-    redirect_to root_path, alert: "Only hosts can manage venues." unless current_user.role == "host"
+    redirect_to root_path, alert: "Only hosts can manage venues." unless current_resource_owner.role == "host"
   end
 end

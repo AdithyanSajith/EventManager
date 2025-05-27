@@ -3,7 +3,7 @@
 <%= link_to "Create New Venue", new_venue_path %>
 
 <ul>
-  <% current_user.venues.each do |venue| %>
+  <% current_resource_owner.venues.each do |venue| %>
     <li>
       <strong><%= venue.name %></strong> – <%= venue.location %>
       (<%= link_to "Edit", edit_venue_path(venue) %>,

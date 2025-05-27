@@ -1,12 +1,12 @@
 module Api
   module V1
     class TicketsController < ApplicationController
-      before_action :authenticate_user!
+      before_action :doorkeeper_authorize!
       respond_to :json
 
       def show
         ticket = Ticket.find(params[:id])
-        if ticket.registration.participant_id != current_user.userable&.id
+        if ticket.registration.participant_id != current_resource_owner.userable&.id
           render json: { error: "Unauthorized access." }, status: :unauthorized
         else
           render json: {

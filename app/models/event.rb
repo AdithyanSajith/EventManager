@@ -10,6 +10,9 @@ class Event < ApplicationRecord
   validates :title, :description, :starts_at, :ends_at, :venue_id, :category_id, :host_id, presence: true
   validate :start_and_end_dates_must_be_valid
 
+  # Callback to notify host about event creation
+  after_create :notify_host_of_event_creation
+
   def start_and_end_dates_must_be_valid
     errors.add(:starts_at, "must be in the future") if starts_at.present? && starts_at < Time.current
     if ends_at.present? && starts_at.present? && ends_at <= starts_at
@@ -17,11 +20,19 @@ class Event < ApplicationRecord
     end
   end
 
-  def self.ransackable_attributes(_auth = nil) #Filter in same table
+  def self.ransackable_attributes(_auth = nil)
     %w[id title description starts_at ends_at created_at updated_at host_id venue_id category_id]
   end
 
-  def self.ransackable_associations(_auth = nil) # Filter table through joins
+  def self.ransackable_associations(_auth = nil)
     %w[host venue category participants registrations reviews]
+  end
+
+  private
+
+  def notify_host_of_event_creation
+    # You can add an email notification to the host here
+    # EventMailer.with(event: self).new_event_created.deliver_later
+    Rails.logger.info "Host notified about event: #{self.title}"
   end
 end

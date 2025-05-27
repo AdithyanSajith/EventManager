@@ -1,12 +1,12 @@
 class EventsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :doorkeeper_authorize!
   before_action :set_event, only: [:show, :edit, :update, :destroy]
   before_action :authorize_host!, only: [:new, :create, :edit, :update, :destroy, :index, :other_events]
   before_action :authorize_participant!, only: [:filtered]
 
   # Show only current host's events
   def index
-    @events = current_user.userable.events.includes(:venue, :category)
+    @events = current_resource_owner.userable.events.includes(:venue, :category)
   end
 
   # Form to create new event
@@ -16,7 +16,7 @@ class EventsController < ApplicationController
 
   # Handle creation logic
   def create
-    @event = current_user.userable.events.build(event_params)
+    @event = current_resource_owner.userable.events.build(event_params)
     if @event.save
       redirect_to @event, notice: "Event was successfully created."
     else
@@ -26,13 +26,13 @@ class EventsController < ApplicationController
 
   # View event details with logic per role
   def show
-    if current_user.role == "participant"
-      @registration = current_user.userable.registrations.find_by(event_id: @event.id)
+    if current_resource_owner.role == "participant"
+      @registration = current_resource_owner.userable.registrations.find_by(event_id: @event.id)
       @payment = @registration&.payment
       @ticket = @registration&.ticket
         
-    elsif current_user.role == "host"
-      if current_user.userable == @event.host
+    elsif current_resource_owner.role == "host"
+      if current_resource_owner.userable == @event.host
         @registrations = @event.registrations.includes(:user)
       else
         # View-only for other hosts
@@ -44,24 +44,24 @@ class EventsController < ApplicationController
 
   # Show events matching participant's interest
   def filtered
-  @events = Event.where(category_id: current_user.interest).includes(:venue, :reviews)
+  @events = Event.where(category_id: current_resource_owner.interest).includes(:venue, :reviews)
 end
 
   # Show events not created by current host
   def other_events
-    @events = Event.where.not(host_id: current_user.userable.id)
+    @events = Event.where.not(host_id: current_resource_owner.userable.id)
   end
 
   # Edit form
   def edit
-    unless current_user.userable == @event.host
+    unless current_resource_owner.userable == @event.host
       redirect_to events_path, alert: "You can only edit your own events."
     end
   end
 
   # Update logic
   def update
-    if current_user.userable == @event.host
+    if current_resource_owner.userable == @event.host
       if @event.update(event_params)
         redirect_to @event, notice: "Event was successfully updated."
       else
@@ -74,7 +74,7 @@ end
 
   # Delete event
   def destroy
-    if current_user.userable == @event.host
+    if current_resource_owner.userable == @event.host
       @event.destroy
       redirect_to events_path, notice: "Event deleted successfully."
     else
@@ -93,12 +93,12 @@ end
   end
 
   def authorize_host!
-    unless current_user.role == "host" && current_user.userable_type == "Host"
+    unless current_resource_owner.role == "host" && current_resource_owner.userable_type == "Host"
       redirect_to root_path, alert: "Only hosts can access this page."
     end
   end
 
   def authorize_participant!
-    redirect_to root_path, alert: "Only participants can access this section." unless current_user.role == "participant"
+    redirect_to root_path, alert: "Only participants can access this section." unless current_resource_owner.role == "participant"
   end
 end

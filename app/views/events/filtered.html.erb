@@ -1,6 +1,6 @@
 <% if @events.any? %>
   <% @events.each do |event| %>
-    <% participant = current_user.userable %>
+    <% participant = current_resource_owner.userable %>
     <% registration = participant ? Registration.find_by(participant_id: participant.id, event_id: event.id) : nil %>
     <% ticket = registration&.ticket %>
     <% payment = registration&.payment %>

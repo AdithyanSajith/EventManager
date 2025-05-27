@@ -18,11 +18,20 @@ class Participant < ApplicationRecord
   validates :interest, length: { maximum: 300 }
   validates :city, length: { maximum: 100 }
 
+  # Callback to ensure interest is initialized
+  before_create :set_default_interest
+
   def self.ransackable_attributes(auth_object = nil)
     %w[id name interest city birthdate created_at updated_at]
   end
 
   def self.ransackable_associations(auth_object = nil)
     %w[user registrations events reviews tickets payments]
+  end
+
+  private
+
+  def set_default_interest
+    self.interest ||= "No interest provided" # Default value if not provided
   end
 end

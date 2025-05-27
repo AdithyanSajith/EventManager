@@ -2,7 +2,7 @@ module Api
   module V1
     module Events
       class ReviewsController < ApplicationController
-        before_action :authenticate_user!
+        before_action :doorkeeper_authorize!
         before_action :set_event
         respond_to :json
 
@@ -15,7 +15,7 @@ module Api
         end
 
         def create
-          review = @event.reviews.new(review_params.merge(participant: current_user.userable))
+          review = @event.reviews.new(review_params.merge(participant: current_resource_owner.userable))
           if review.save
             render json: { message: "Review submitted." }, status: :created
           else

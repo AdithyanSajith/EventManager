@@ -2,12 +2,12 @@ module Api
   module V1
     module Events
       class PaymentsController < ApplicationController
-        before_action :authenticate_user!
+        before_action :doorkeeper_authorize!
         before_action :set_event
         respond_to :json
 
         def create
-          participant = current_user.userable
+          participant = current_resource_owner.userable
           registration = Registration.find_or_create_by(participant: participant, event: @event)
 
           if registration.payment.present?
