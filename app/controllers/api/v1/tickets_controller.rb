@@ -1,7 +1,7 @@
 module Api
   module V1
     class TicketsController < ApplicationController
-      before_action :doorkeeper_authorize!
+      before_action :authenticate_resource_owner!
       respond_to :json
 
       def show
@@ -18,11 +18,31 @@ module Api
               ends_at: ticket.registration.event.ends_at,
               venue: ticket.registration.event.venue.name
             }
-          }
+          }, status: :ok
         end
       rescue ActiveRecord::RecordNotFound
         render json: { error: "Ticket not found." }, status: :not_found
       end
+
+      # Combined auth supporting OAuth token or Devise session
+      private
+
+      def authenticate_resource_owner!
+        if doorkeeper_token
+          doorkeeper_authorize!
+        else
+          authenticate_user!
+        end
+      end
+
+      def current_resource_owner
+        if doorkeeper_token
+          User.find(doorkeeper_token.resource_owner_id)
+        else
+          current_user
+        end
+      end
+      helper_method :current_resource_owner
     end
   end
 end

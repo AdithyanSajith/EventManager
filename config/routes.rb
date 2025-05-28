@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   use_doorkeeper
+
   # Devise routes for unified User model
   devise_for :users, module: 'users', controllers: {
     registrations: 'users/registrations',
@@ -56,14 +57,18 @@ Rails.application.routes.draw do
   # -----------------------------
   namespace :api do
     namespace :v1 do
-      resources :events, only: [:index] do  # Added index action for events
-        resources :reviews, only: [:index, :create]
+      resources :events, only: [:index, :show, :create, :update, :destroy] do
+        resources :reviews, only: [:index, :create], module: :events
+        resources :registrations, only: [:index, :create], module: :events  # Included :index here
+
         get 'registration_status', to: 'events/registrations#status'
         post 'payment', to: 'events/payments#create'
       end
 
       resources :tickets, only: [:show]
       resource :profile, only: [:show, :update]
+
+      get 'user_registered_events', to: 'events/registrations#user_registered_events'
     end
   end
 end

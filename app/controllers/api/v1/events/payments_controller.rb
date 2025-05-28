@@ -2,7 +2,7 @@ module Api
   module V1
     module Events
       class PaymentsController < ApplicationController
-        before_action :doorkeeper_authorize!
+        before_action :authenticate_resource_owner!
         before_action :set_event
         respond_to :json
 
@@ -28,11 +28,31 @@ module Api
 
         def set_event
           @event = Event.find(params[:event_id])
+        rescue ActiveRecord::RecordNotFound
+          render json: { error: "Event not found" }, status: :not_found
         end
 
         def payment_params
           params.require(:payment).permit(:amount, :card_number)
         end
+
+        # Combined auth supporting OAuth token or Devise session
+        def authenticate_resource_owner!
+          if doorkeeper_token
+            doorkeeper_authorize!
+          else
+            authenticate_user!
+          end
+        end
+
+        def current_resource_owner
+          if doorkeeper_token
+            User.find(doorkeeper_token.resource_owner_id)
+          else
+            current_user
+          end
+        end
+        helper_method :current_resource_owner
       end
     end
   end

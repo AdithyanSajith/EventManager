@@ -1,5 +1,6 @@
 class EventsController < ApplicationController
-  before_action :doorkeeper_authorize!
+  before_action :authenticate_resource_owner!
+
   before_action :set_event, only: [:show, :edit, :update, :destroy]
   before_action :authorize_host!, only: [:new, :create, :edit, :update, :destroy, :index, :other_events]
   before_action :authorize_participant!, only: [:filtered]
@@ -30,7 +31,7 @@ class EventsController < ApplicationController
       @registration = current_resource_owner.userable.registrations.find_by(event_id: @event.id)
       @payment = @registration&.payment
       @ticket = @registration&.ticket
-        
+
     elsif current_resource_owner.role == "host"
       if current_resource_owner.userable == @event.host
         @registrations = @event.registrations.includes(:user)
@@ -44,8 +45,8 @@ class EventsController < ApplicationController
 
   # Show events matching participant's interest
   def filtered
-  @events = Event.where(category_id: current_resource_owner.interest).includes(:venue, :reviews)
-end
+    @events = Event.where(category_id: current_resource_owner.interest).includes(:venue, :reviews)
+  end
 
   # Show events not created by current host
   def other_events
@@ -93,12 +94,50 @@ end
   end
 
   def authorize_host!
-    unless current_resource_owner.role == "host" && current_resource_owner.userable_type == "Host"
+    unless current_resource_owner&.role == "host" && current_resource_owner&.userable_type == "Host"
       redirect_to root_path, alert: "Only hosts can access this page."
     end
   end
 
   def authorize_participant!
-    redirect_to root_path, alert: "Only participants can access this section." unless current_resource_owner.role == "participant"
+    Rails.logger.info "authorize_participant! current_resource_owner role: #{current_resource_owner&.role.inspect}"
+    redirect_to root_path, alert: "Only participants can access this section." unless current_resource_owner&.role == "participant"
+  end
+
+  # Combined authentication supporting Doorkeeper token or Devise session
+  def authenticate_resource_owner!
+    if doorkeeper_token
+      doorkeeper_authorize!
+    else
+      authenticate_user!
+    end
+  end
+
+  # Override after_sign_in_path_for in ApplicationController (if not done already)
+  # This ensures redirect after login based on role
+  def after_sign_in_path_for(resource)
+    if resource.respond_to?(:role)
+      case resource.role
+      when 'participant'
+        filtered_events_path
+      when 'host'
+        host_dashboard_path
+      else
+        root_path
+      end
+    else
+      root_path
+    end
+  end
+
+  helper_method :current_resource_owner
+
+  # Ensure current_resource_owner returns the logged-in user (Devise) or user from OAuth token
+  def current_resource_owner
+    if doorkeeper_token
+      User.find(doorkeeper_token.resource_owner_id)
+    else
+      current_user
+    end
   end
 end
