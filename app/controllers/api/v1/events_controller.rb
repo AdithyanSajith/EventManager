@@ -1,7 +1,7 @@
 module Api
   module V1
     class EventsController < ApplicationController
-      before_action :authenticate_resource_owner!, except: [:index, :show]
+      before_action :authenticate_resource_owner!, except: [:index, :show, :top_rated]
       before_action :set_event, only: [:show, :update, :destroy]
       respond_to :json
 
@@ -15,25 +15,52 @@ module Api
       end
 
       def create
-        @event = Event.new(event_params)
+        unless current_resource_owner&.role == 'host'
+          render json: { error: 'Only hosts can create events.' }, status: :forbidden and return
+        end
+
+        @event = current_resource_owner.userable.events.build(event_params)
+
         if @event.save
           render json: @event, status: :created
         else
-          render json: @event.errors, status: :unprocessable_entity
+          render json: { errors: @event.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
       def update
+        unless @event.host == current_resource_owner.userable
+          return render json: { error: 'Unauthorized' }, status: :unauthorized
+        end
+
         if @event.update(event_params)
           render json: @event, status: :ok
         else
-          render json: @event.errors, status: :unprocessable_entity
+          render json: { errors: @event.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
       def destroy
+        unless @event.host == current_resource_owner.userable
+          return render json: { error: 'Unauthorized' }, status: :unauthorized
+        end
+
         @event.destroy
         head :no_content
+      end
+
+      def top_rated
+        top_events = Event
+          .left_joins(:reviews)
+          .group('events.id')
+          .select('events.*, AVG(reviews.rating) as average_rating')
+          .order('average_rating DESC NULLS LAST')
+          .limit(5)
+
+        render json: top_events.as_json(
+          only: [:id, :title, :description, :starts_at, :ends_at],
+          methods: [:average_rating]
+        )
       end
 
       private
@@ -45,10 +72,9 @@ module Api
       end
 
       def event_params
-        params.require(:event).permit(:title, :description, :starts_at, :ends_at, :host_id, :category_id, :venue_id)
+        params.require(:event).permit(:title, :description, :starts_at, :ends_at, :category_id, :venue_id)
       end
 
-      # Combined auth supporting OAuth token or Devise session
       def authenticate_resource_owner!
         if doorkeeper_token
           doorkeeper_authorize!
@@ -64,6 +90,7 @@ module Api
           current_user
         end
       end
+
       helper_method :current_resource_owner
     end
   end

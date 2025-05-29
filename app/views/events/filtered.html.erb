@@ -7,7 +7,7 @@
     <% reviews = event.reviews.includes(:participant).order(created_at: :desc) %>
 
     <div class="card shadow-sm mb-4">
-      <div class="card-body" data-controller="payment" data-payment-event-id="<%= event.id %>">
+      <div class="card-body">
         <h5 class="card-title"><%= event.title %></h5>
         <p class="card-text"><%= event.description %></p>
 
@@ -21,22 +21,21 @@
         <% end %>
 
         <% if ticket.present? %>
-          <p class="text-success">🎟️ Ticket ID: <%= ticket.id %></p>
+          <div class="alert alert-success p-2">
+            🎟️ Ticket ID: <%= ticket.id %> | Issued At: <%= ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %>
+          </div>
           <%= link_to "View Ticket", ticket_path(ticket), class: "btn btn-outline-success btn-sm me-2" %>
           <%= link_to "Add Review", new_event_review_path(event), class: "btn btn-outline-primary btn-sm" %>
-        <% else %>
-          <!-- Payment button managed by Stimulus -->
-          <button data-payment-target="button" data-action="click->payment#pay" class="btn btn-warning btn-sm" style="display:none;">
-            Pay Now
-          </button>
-        <% end %>
 
-        <!-- Async status from Stimulus -->
-        <div class="mt-2">
-          <span data-payment-target="status" class="badge bg-info-subtle text-dark">
-            Checking status...
-          </span>
-        </div>
+        <% elsif registration.present? %>
+          <div class="alert alert-warning p-2">
+            💳 You are registered but payment is pending.
+          </div>
+          <%= link_to "Complete Payment", new_event_payment_path(event), class: "btn btn-warning btn-sm" %>
+
+        <% else %>
+          <%= link_to "Register & Pay", new_event_payment_path(event), class: "btn btn-primary btn-sm" %>
+        <% end %>
 
         <% if reviews.any? %>
           <hr>

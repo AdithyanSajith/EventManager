@@ -1,5 +1,6 @@
 class ParticipantsController < ApplicationController
-  before_action :doorkeeper_authorize!
+  # Use Devise's authenticate_user! for web-based authentication
+  before_action :authenticate_user!
   before_action :authorize_participant!
 
   def choose_category
@@ -32,6 +33,7 @@ class ParticipantsController < ApplicationController
 
   private
 
+  # Ensure the user is a participant
   def authorize_participant!
     unless current_resource_owner.role == "participant"
       redirect_to root_path, alert: "Only participants can access this page."

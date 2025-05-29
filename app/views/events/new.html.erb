@@ -1,4 +1,4 @@
-<%= form_with(model: @event, local: true) do |form| %>
+<%= form_with(model: @event, local: true, authenticity_token: true) do |form| %>
   <div class="mb-3">
     <%= form.label :title %>
     <%= form.text_field :title, class: "form-control", placeholder: "Enter event title" %>

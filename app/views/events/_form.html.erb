@@ -1,60 +1,49 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <h2 class="mb-4 text-center">
-        <%= event.persisted? ? "✏️ Edit Event" : "➕ Create New Event" %>
-      </h2>
-
-      <%= form_with(model: event, local: true) do |form| %>
-        <% if event.errors.any? %>
-          <div class="alert alert-danger">
-            <h4><%= pluralize(event.errors.count, "error") %> prohibited this event from being saved:</h4>
-            <ul>
-              <% event.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-              <% end %>
-            </ul>
-          </div>
+<%= form_with(model: event, local: true, authenticity_token: true, data: { turbo: false }) do |form| %>
+  <% if event.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(event.errors.count, "error") %> prohibited this event from being saved:</h4>
+      <ul>
+        <% event.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
         <% end %>
+      </ul>
+    </div>
+  <% end %>
 
-        <div class="mb-3">
-          <%= form.label :title, class: "form-label" %>
-          <%= form.text_field :title, class: "form-control", required: true %>
-        </div>
+  <div class="mb-3">
+    <%= form.label :title, class: "form-label" %>
+    <%= form.text_field :title, class: "form-control", required: true %>
+  </div>
 
-        <div class="mb-3">
-          <%= form.label :description, class: "form-label" %>
-          <%= form.text_area :description, class: "form-control", rows: 4, required: true %>
-        </div>
+  <div class="mb-3">
+    <%= form.label :description, class: "form-label" %>
+    <%= form.text_area :description, class: "form-control", rows: 4, required: true %>
+  </div>
 
-        <div class="mb-3">
-          <%= form.label :starts_at, class: "form-label" %>
-          <%= form.datetime_select :starts_at, { default: Time.current + 1.hour }, { class: "form-select" } %>
-        </div>
+  <div class="mb-3">
+    <%= form.label :starts_at, class: "form-label" %>
+    <%= form.datetime_select :starts_at, { default: Time.current + 1.hour }, { class: "form-select" } %>
+  </div>
 
-        <div class="mb-3">
-          <%= form.label :ends_at, class: "form-label" %>
-          <%= form.datetime_select :ends_at, { default: Time.current + 2.hours }, { class: "form-select" } %>
-        </div>
+  <div class="mb-3">
+    <%= form.label :ends_at, class: "form-label" %>
+    <%= form.datetime_select :ends_at, { default: Time.current + 2.hours }, { class: "form-select" } %>
+  </div>
 
-        <div class="mb-3">
-          <%= form.label :category_id, "Category", class: "form-label" %>
-          <%= form.collection_select :category_id, Category.all, :id, :name, { prompt: "Choose Category" }, { class: "form-select" } %>
-        </div>
+  <div class="mb-3">
+    <%= form.label :category_id, "Category", class: "form-label" %>
+    <%= form.collection_select :category_id, Category.all, :id, :name, { prompt: "Choose Category" }, { class: "form-select" } %>
+  </div>
 
-        <div class="mb-3">
-          <%= form.label :venue_id, "Venue", class: "form-label" %>
-          <div class="d-flex gap-2">
-            <%= form.collection_select :venue_id, Venue.all, :id, :name, { prompt: "Choose Venue" }, { class: "form-select" } %>
-            <%= link_to "➕ Add Venue", new_venue_path, class: "btn btn-outline-primary btn-sm", target: "_blank" %>
-          </div>
-        </div>
-
-        <div class="text-center mt-4">
-          <%= form.submit event.persisted? ? "Update Event" : "Create Event",
-                class: "btn btn-success px-4 py-2" %>
-        </div>
-      <% end %>
+  <div class="mb-3">
+    <%= form.label :venue_id, "Venue", class: "form-label" %>
+    <div class="d-flex gap-2">
+      <%= form.collection_select :venue_id, Venue.all, :id, :name, { prompt: "Choose Venue" }, { class: "form-select" } %>
+      <%= link_to "➕ Add Venue", new_venue_path, class: "btn btn-outline-primary btn-sm", target: "_blank" %>
     </div>
   </div>
-</div>
+
+  <div class="text-center mt-4">
+    <%= form.submit event.persisted? ? "Update Event" : "Create Event", class: "btn btn-success px-4 py-2" %>
+  </div>
+<% end %>

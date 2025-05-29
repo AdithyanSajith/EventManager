@@ -10,7 +10,6 @@ class Event < ApplicationRecord
   validates :title, :description, :starts_at, :ends_at, :venue_id, :category_id, :host_id, presence: true
   validate :start_and_end_dates_must_be_valid
 
-  # Callback to notify host about event creation
   after_create :notify_host_of_event_creation
 
   def start_and_end_dates_must_be_valid
@@ -18,6 +17,10 @@ class Event < ApplicationRecord
     if ends_at.present? && starts_at.present? && ends_at <= starts_at
       errors.add(:ends_at, "must be after the start time")
     end
+  end
+
+  def average_rating
+    reviews.average(:rating)&.round(2) || 0.0
   end
 
   def self.ransackable_attributes(_auth = nil)
@@ -31,8 +34,6 @@ class Event < ApplicationRecord
   private
 
   def notify_host_of_event_creation
-    # You can add an email notification to the host here
-    # EventMailer.with(event: self).new_event_created.deliver_later
     Rails.logger.info "Host notified about event: #{self.title}"
   end
 end

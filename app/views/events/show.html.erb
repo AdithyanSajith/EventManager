@@ -10,8 +10,8 @@
       <p><strong>Category:</strong> <%= @event.category.name %></p>
 
       <% if current_resource_owner&.role == "participant" %>
-        <% registration = current_resource_owner.userable&.registrations&.find_by(event_id: @event.id) %>
-        <% ticket = registration&.ticket %>
+        <% registration = @registration %>
+        <% ticket = @ticket %>
 
         <% if ticket.present? %>
           <div class="alert alert-success mt-4">

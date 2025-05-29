@@ -1,5 +1,6 @@
 class PaymentsController < ApplicationController
-  before_action :doorkeeper_authorize!
+  # Use Devise's authenticate_user! for web-based authentication
+  before_action :authenticate_user!
   before_action :authorize_participant!
   before_action :set_event
 
