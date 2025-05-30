@@ -1,5 +1,15 @@
 <h2>Log in</h2>
 
+<% if flash[:alert] %>
+  <div class="flash-alert" style="display:none;"><%= flash[:alert] %></div>
+<% end %>
+<% if flash[:notice] %>
+  <div class="flash-notice" style="display:none;"><%= flash[:notice] %></div>
+<% end %>
+<% if flash[:error] %>
+  <div class="flash-error" style="display:none;"><%= flash[:error] %></div>
+<% end %>
+
 <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
   <div class="field">
     <%= f.label :email %><br />

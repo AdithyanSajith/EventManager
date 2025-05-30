@@ -3,6 +3,7 @@ module Api
     class EventsController < ApplicationController
       before_action :authenticate_resource_owner!, except: [:index, :show, :top_rated]
       before_action :set_event, only: [:show, :update, :destroy]
+      before_action :check_event_time, only: [:update, :destroy]
       respond_to :json
 
       def index
@@ -88,6 +89,12 @@ module Api
           User.find(doorkeeper_token.resource_owner_id)
         else
           current_user
+        end
+      end
+
+      def check_event_time
+        if @event.starts_at < Time.current
+          render json: { error: 'Cannot modify events that have already started.' }, status: :forbidden
         end
       end
 

@@ -17,6 +17,7 @@ class Registration < ApplicationRecord
 
   private
 
+  # Create ticket after registration
   def create_ticket
     # Ticket creation logic
     ticket = self.create_ticket!(ticket_number: SecureRandom.hex(6), issued_at: Time.current)

@@ -23,6 +23,7 @@ class Host < ApplicationRecord
 
   private
 
+  # Set default bio if missing
   def set_default_bio
     self.bio ||= "No bio provided." # Set a default bio if not provided
   end
