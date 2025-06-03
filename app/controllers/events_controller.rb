@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  before_action :authenticate_resource_owner!
+  before_action :authenticate_resource_owner!, except: [:show]
   before_action :set_event, only: [:show, :edit, :update, :destroy]
   before_action :authorize_host!, only: [:new, :create, :edit, :update, :destroy, :index, :other_events]
   before_action :authorize_participant!, only: [:filtered]
@@ -22,15 +22,18 @@ class EventsController < ApplicationController
   end
 
   def show
-    if current_resource_owner.role == "participant"
-      @registration = current_resource_owner.userable.registrations.find_by(event_id: @event.id)
-      @payment = @registration&.payment
-      @ticket = @registration&.ticket
-    elsif current_resource_owner.role == "host" && current_resource_owner.userable == @event.host
-      @registrations = @event.registrations.includes(:user)
-    else
-      redirect_to root_path, alert: "You are not authorized to view this event."
+    @event = Event.find(params[:id])
+    # Allow anyone to view event details, but only show registration/payment/ticket if logged in and authorized
+    if user_signed_in?
+      if current_resource_owner.role == "participant"
+        @registration = current_resource_owner.userable.registrations.find_by(event_id: @event.id)
+        @payment = @registration&.payment
+        @ticket = @registration&.ticket
+      elsif current_resource_owner.role == "host" && current_resource_owner.userable == @event.host
+        @registrations = @event.registrations.includes(:user)
+      end
     end
+    # Render show view for all users (even if not logged in)
   end
 
   def filtered

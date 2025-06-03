@@ -55,4 +55,13 @@ class Event < ApplicationRecord
   def notify_host_of_event_creation
     Rails.logger.info "Host notified about event: #{self.title}"
   end
+
+  public
+
+  # Update rating (stub method to prevent NoMethodError)
+  def update_rating
+    # No-op or implement logic if you want to cache average rating
+    # For now, this can be left empty or log the update
+    Rails.logger.info "update_rating called for event: \\#{self.id}"
+  end
 end

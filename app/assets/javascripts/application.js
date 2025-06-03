@@ -1,19 +1,26 @@
+//= require jquery
 //= require toastr
 //= require_tree .
 // Show toastr notifications for Rails flash messages
-document.addEventListener('DOMContentLoaded', function() {
+function showToastrFromFlash() {
   if (typeof toastr !== 'undefined') {
     var notice = document.querySelector('.flash-notice');
     var alert = document.querySelector('.flash-alert');
     var error = document.querySelector('.flash-error');
-    if (notice) {
-      toastr.success(notice.textContent);
+    if (notice && notice.textContent.trim() !== "") {
+      toastr.success(notice.textContent.trim());
+      notice.remove();
     }
-    if (alert) {
-      toastr.error(alert.textContent);
+    if (alert && alert.textContent.trim() !== "") {
+      toastr.error(alert.textContent.trim());
+      alert.remove();
     }
-    if (error) {
-      toastr.error(error.textContent);
+    if (error && error.textContent.trim() !== "") {
+      toastr.error(error.textContent.trim());
+      error.remove();
     }
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', showToastrFromFlash);
+document.addEventListener('turbo:load', showToastrFromFlash);

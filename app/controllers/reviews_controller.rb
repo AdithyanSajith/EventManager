@@ -23,6 +23,7 @@ class ReviewsController < ApplicationController
     if @review.save
       redirect_to @reviewable, notice: "Review submitted!"
     else
+      flash.now[:alert] = @review.errors.full_messages.to_sentence
       render :new, status: :unprocessable_entity
     end
   end

@@ -6,14 +6,64 @@ module Users
     # POST /resource
     def create
       build_resource(sign_up_params)
+      begin
+        # Build userable before saving user
+        case resource.role
+        when "host"
+          required = [resource.organisation, resource.website, resource.bio, resource.number]
+          if required.any?(&:blank?)
+            flash.now[:alert] = "All host fields (organisation, website, bio, number) must be present."
+            clean_up_passwords resource
+            respond_with resource and return
+          end
+          userable = Host.new(
+            organisation: resource.organisation,
+            website: resource.website,
+            bio: resource.bio,
+            number: resource.number
+          )
+        when "participant"
+          required = [resource.name, resource.interest, resource.city, resource.birthdate]
+          if required.any?(&:blank?)
+            flash.now[:alert] = "All participant fields (name, interest, city, birthdate) must be present."
+            clean_up_passwords resource
+            respond_with resource and return
+          end
+          userable = Participant.new(
+            name: resource.name,
+            interest: resource.interest,
+            city: resource.city,
+            birthdate: resource.birthdate
+          )
+        else
+          flash.now[:alert] = "Invalid role selected."
+          clean_up_passwords resource
+          respond_with resource and return
+        end
 
-      if resource.save
-        assign_userable(resource)
-        sign_up(resource_name, resource)
-        respond_with resource, location: after_sign_up_path_for(resource)
-      else
+        ActiveRecord::Base.transaction do
+          userable.save!
+          resource.userable = userable
+          resource.save!
+        end
+
+        flash[:notice] = "Sign up successful! Welcome to Event Manager."
+        if resource.active_for_authentication?
+          set_flash_message! :notice, :signed_up
+          sign_up(resource_name, resource)
+          respond_with resource, location: after_sign_up_path_for(resource)
+        else
+          set_flash_message! :notice, "signed_up_but_#{resource.inactive_message}"
+          expire_data_after_sign_in!
+          respond_with resource, location: after_inactive_sign_up_path_for(resource)
+        end
+      rescue ActiveRecord::RecordInvalid => e
+        flash.now[:alert] = e.record.errors.full_messages.to_sentence.presence || e.message
         clean_up_passwords resource
-        set_minimum_password_length
+        respond_with resource
+      rescue => e
+        flash.now[:alert] = e.message.presence || "Registration failed."
+        clean_up_passwords resource
         respond_with resource
       end
     end
@@ -74,32 +124,34 @@ module Users
     def assign_userable(user)
       return if user.userable.present?
 
-      userable = case user.role
-                 when "host"
-                   Host.create!(
-                     organisation: user.organisation,
-                     website: user.website,
-                     bio: user.bio,
-                     number: user.number
-                   )
-                 when "participant"
-                   Participant.create!(
-                     name: user.name,
-                     interest: user.interest,
-                     city: user.city,
-                     birthdate: user.birthdate
-                   )
-                 else
-                   nil
-                 end
-
-      if userable
-        user.update!(userable: userable)
+      case user.role
+      when "host"
+        required = [user.organisation, user.website, user.bio, user.number]
+        if required.any?(&:blank?)
+          raise "All host fields (organisation, website, bio, number) must be present."
+        end
+        userable = Host.create!(
+          organisation: user.organisation,
+          website: user.website,
+          bio: user.bio,
+          number: user.number
+        )
+      when "participant"
+        required = [user.name, user.interest, user.city, user.birthdate]
+        if required.any?(&:blank?)
+          raise "All participant fields (name, interest, city, birthdate) must be present."
+        end
+        userable = Participant.create!(
+          name: user.name,
+          interest: user.interest,
+          city: user.city,
+          birthdate: user.birthdate
+        )
       else
-        user.destroy # Clean up invalid role signups
-        flash[:alert] = "Invalid role selected."
-        redirect_to new_user_registration_path
+        raise "Invalid role selected."
       end
+
+      user.update!(userable: userable)
     end
   end
 end

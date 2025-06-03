@@ -48,10 +48,10 @@ class PaymentsController < ApplicationController
         )
       end
 
-      flash.now[:notice] = "✅ Payment successful and ticket issued!"
-      render :new
+      flash[:notice] = "✅ Payment successful and ticket issued!"
+      redirect_to filtered_events_path
     else
-      flash.now[:alert] = "❌ Payment failed: " + @payment.errors.full_messages.to_sentence
+      flash.now[:alert] = @payment.errors.full_messages.to_sentence
       render :new, status: :unprocessable_entity
     end
   end

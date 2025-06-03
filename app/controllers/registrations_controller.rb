@@ -10,7 +10,7 @@ class RegistrationsController < ApplicationController
     @registration = @event.registrations.new(participant_id: current_resource_owner.userable&.id)
 
     if @registration.save
-      redirect_to filtered_events_path, notice: "You have successfully registered for this event."
+      redirect_to filtered_events_path, notice: "You have successfully registered for this event!"
     else
       flash.now[:alert] = "Registration failed."
       render :new

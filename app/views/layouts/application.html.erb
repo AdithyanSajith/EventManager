@@ -90,10 +90,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
 
-    <!-- JavaScript (ESM + Turbo + Stimulus) -->
-    <%= javascript_include_tag "application", type: "module", "data-turbo-track": "reload" %>
-
     <!-- Toastr JS via CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <!-- JavaScript (ESM + Turbo + Stimulus) -->
+    <%= javascript_include_tag "application", "data-turbo-track": "reload" %>
   </body>
 </html>

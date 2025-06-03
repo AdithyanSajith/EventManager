@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception, unless: -> {
     request.format.json? || request.format.turbo_stream?
-  }
+  } #Enable CSRF protection for all except JSON and Turbo Stream requests
 
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :store_user_location!, if: :storable_location?
