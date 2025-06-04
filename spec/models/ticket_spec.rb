@@ -15,5 +15,4 @@ RSpec.describe Ticket, type: :model do
     expect(ticket.ticket_number).not_to be_nil
   end
 
-  # Add more edge cases as needed
 end

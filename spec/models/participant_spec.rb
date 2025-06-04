@@ -5,24 +5,8 @@ RSpec.describe Participant, type: :model do
     expect(build(:participant)).to be_valid
   end
 
-  it 'is invalid without name' do
-    expect(build(:participant, name: nil)).not_to be_valid
-  end
-
-  it 'is invalid without city' do
-    expect(build(:participant, city: nil)).not_to be_valid
-  end
-
-  it 'is invalid without interest' do
-    expect(build(:participant, interest: nil)).not_to be_valid
-  end
-
-  it 'is invalid without birthdate' do
-    expect(build(:participant, birthdate: nil)).not_to be_valid
-  end
-
   it 'is invalid with too long interest' do
-    expect(build(:participant, interest: 'a' * 301)).not_to be_valid
+    expect(build(:participant, interest: 'a' * 100)).not_to be_valid
   end
 
   it 'is invalid with too long city' do
@@ -35,5 +19,32 @@ RSpec.describe Participant, type: :model do
     expect(participant.interest).not_to be_nil
   end
 
-  # Add more edge cases as needed
+  it 'is valid without interest (default is set)' do
+    participant = build(:participant, interest: nil)
+    expect(participant).to be_valid
+    participant.save
+    expect(participant.interest).to eq('No interest provided')
+  end
+
+  it 'is valid without name (default is set)' do
+    participant = build(:participant, name: nil)
+    expect(participant).to be_valid
+    participant.save
+    expect(participant.name).to eq('No name provided')
+  end
+
+  it 'is valid without city (default is set)' do
+    participant = build(:participant, city: nil)
+    expect(participant).to be_valid
+    participant.save
+    expect(participant.city).to eq('No city provided')
+  end
+
+  it 'is valid without birthdate (default is set)' do
+    participant = build(:participant, birthdate: nil)
+    expect(participant).to be_valid
+    participant.save
+    expect(participant.birthdate).to eq(Date.new(2000, 1, 1))
+  end
+
 end

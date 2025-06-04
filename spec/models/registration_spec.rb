@@ -18,5 +18,11 @@ RSpec.describe Registration, type: :model do
     expect(registration.ticket).to be_present
   end
 
-  # Add more edge cases as needed
+  it 'can have a payment associated' do
+    registration = create(:registration)
+    payment = create(:payment, registration: registration, amount: 100.0)
+    expect(registration.payment).to eq(payment)
+    expect(payment.amount).to eq(100.0)
+  end
+
 end

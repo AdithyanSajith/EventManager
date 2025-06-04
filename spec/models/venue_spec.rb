@@ -25,5 +25,4 @@ RSpec.describe Venue, type: :model do
     expect(build(:venue, capacity: -10)).not_to be_valid
   end
 
-  # Add more edge cases as needed
 end

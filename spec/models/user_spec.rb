@@ -37,6 +37,5 @@ RSpec.describe User, type: :model do
     user.save
     expect(user.errors[:userable]).to be_present
   end
-
-  # Add more edge cases as needed
+  
 end
