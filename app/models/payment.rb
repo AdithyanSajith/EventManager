@@ -1,6 +1,8 @@
 class Payment < ApplicationRecord
   belongs_to :registration
 
+  validates :amount, numericality: { greater_than_or_equal_to: 0 }
+
   # Callback to notify participant when payment is completed
   after_create :send_payment_confirmation
 

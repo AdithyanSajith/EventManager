@@ -12,6 +12,6 @@ class Ticket < ApplicationRecord
 
   def assign_ticket_number
     self.ticket_number ||= SecureRandom.hex(6).upcase
-    self.issued_at = Time.current
+    self.issued_at ||= Time.current
   end
 end

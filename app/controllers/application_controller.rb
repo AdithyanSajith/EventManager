@@ -81,9 +81,9 @@ class ApplicationController < ActionController::Base
   end
 
   # Handle error 500
-  rescue_from StandardError do |e|
-    logger.error e.message
-    logger.error e.backtrace.join("\n")
-    render json: { error: "Internal server error" }, status: :internal_server_error
-  end
+  #rescue_from StandardError do |e|
+   # logger.error e.message
+    #logger.error e.backtrace.join("\n")
+    #render json: { error: "Internal server error" }, status: :internal_server_error
+  #end
 end

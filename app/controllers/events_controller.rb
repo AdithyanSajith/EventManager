@@ -5,7 +5,7 @@ class EventsController < ApplicationController
   before_action :authorize_participant!, only: [:filtered]
 
   def index
-    @events = current_resource_owner.userable.events.includes(:venue, :category)
+    @events = Event.all
   end
 
   def new

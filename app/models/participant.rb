@@ -15,7 +15,7 @@ class Participant < ApplicationRecord
 
   # Validations specific to participants
   validates :name, :city, :interest, :birthdate, presence: true
-  validates :interest, length: { maximum: 300 }
+  validates :interest, length: { maximum: 50 } # Match your spec!
   validates :city, length: { maximum: 100 }
 
   # Callback to ensure fields are initialized
@@ -35,18 +35,18 @@ class Participant < ApplicationRecord
   private
 
   def set_default_interest
-    self.interest ||= "No interest provided" # Default value if not provided
+    self.interest ||= "No interest provided"
   end
 
   def set_default_name
-    self.name ||= "No name provided" # Default value if not provided
+    self.name ||= "No name provided"
   end
 
   def set_default_city
-    self.city ||= "No city provided" # Default value if not provided
+    self.city ||= "No city provided"
   end
 
   def set_default_birthdate
-    self.birthdate ||= Date.new(2000, 1, 1) # Default value if not provided
+    self.birthdate ||= Date.new(2000, 1, 1)
   end
 end

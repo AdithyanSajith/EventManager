@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :venue do
-    name { "Test Venue" }
+    sequence(:name) { |n| "Venue #{n}" }
     address { "123 Test St" }
     city { "Test City" }
     capacity { 100 }

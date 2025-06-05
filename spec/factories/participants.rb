@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :participant do
-    name { "Test Participant" }
+    sequence(:name) { |n| "Test Participant #{n}" }
     city { "Test City" }
     interest { "Music" }
     birthdate { Date.today - 20.years }

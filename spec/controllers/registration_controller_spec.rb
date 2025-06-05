@@ -1,9 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe RegistrationsController, type: :controller do
+  include Devise::Test::ControllerHelpers
+
+  let!(:user) { create(:user) }
   let!(:participant) { create(:participant) } # let ensures the participant is created before tests run
   let!(:event) { create(:event) }
   let!(:registration) { create(:registration, participant: participant, event: event) } # Links reg with participant and event
+
+  before { sign_in user }
 
   describe 'GET #index' do
     it 'returns a successful response' do

@@ -1,5 +1,5 @@
 FactoryBot.define do
   factory :category do
-    name { "Music" }
+    sequence(:name) { |n| "Music#{n}" } # Ensure uniqueness for tests
   end
 end

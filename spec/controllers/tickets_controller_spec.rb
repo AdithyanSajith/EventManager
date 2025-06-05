@@ -1,7 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe TicketsController, type: :controller do
+  include Devise::Test::ControllerHelpers
+
+  let!(:user) { create(:user) }
   let!(:ticket) { create(:ticket) }
+
+  before { sign_in user }
 
   describe 'GET #index' do
     it 'returns a successful response' do

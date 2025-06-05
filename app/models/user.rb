@@ -14,7 +14,7 @@ class User < ApplicationRecord
 
   # ✅ Required by Ransack for ActiveAdmin filtering/search
   def self.ransackable_attributes(_auth_object = nil)
-    %w[ id name email role interest city birthdate number organisation website bio userable_id userable_type created_at updated_at ]
+    %w[id name email role interest city birthdate number organisation website bio userable_id userable_type created_at updated_at]
   end
 
   def self.ransackable_associations(_auth_object = nil)

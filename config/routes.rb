@@ -38,9 +38,12 @@ Rails.application.routes.draw do
   resources :reviews, except: [:new, :create]
   get '/reviews/new', to: redirect('/')
 
-  resources :registrations, only: [:create, :destroy]
+  resources :registrations
   resources :categories
-  resources :tickets, only: [:show]
+  resources :tickets
+  resources :participants
+  resources :payments
+  resources :users, only: [:show] # <-- Added for UsersController#show spec
 
   namespace :api do
     namespace :v1 do

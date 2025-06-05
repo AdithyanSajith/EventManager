@@ -1,8 +1,40 @@
 class ParticipantsController < ApplicationController
-  # Use Devise's authenticate_user! for web-based authentication
   before_action :authenticate_user!
   before_action :authorize_participant!
 
+  def index
+    @participants = Participant.all
+  end
+
+  def show
+    @participant = Participant.find(params[:id])
+  end
+
+  def create
+    @participant = Participant.new(participant_params)
+    if @participant.save
+      redirect_to @participant
+    else
+      render :new
+    end
+  end
+
+  def update
+    @participant = Participant.find(params[:id])
+    if @participant.update(participant_params)
+      redirect_to @participant
+    else
+      render :edit
+    end
+  end
+
+  def destroy
+    @participant = Participant.find(params[:id])
+    @participant.destroy
+    redirect_to participants_path
+  end
+
+  # --- Your custom actions below ---
   def choose_category
     @categories = Category.all
   end
@@ -31,12 +63,21 @@ class ParticipantsController < ApplicationController
     @participant = current_resource_owner
   end
 
+  # Add this method so current_resource_owner works with Devise
+  def current_resource_owner
+    current_user
+  end
+
   private
 
   # Ensure the user is a participant
   def authorize_participant!
-    unless current_resource_owner.role == "participant"
+    unless current_resource_owner&.role == "participant"
       redirect_to root_path, alert: "Only participants can access this page."
     end
+  end
+
+  def participant_params
+    params.require(:participant).permit(:name, :interest, :city, :birthdate)
   end
 end

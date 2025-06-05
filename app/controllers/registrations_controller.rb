@@ -1,6 +1,15 @@
 class RegistrationsController < ApplicationController
-  before_action :doorkeeper_authorize!
-  before_action :set_event
+  before_action :authenticate_user!
+  before_action :set_event, only: [:new, :create]
+  before_action :set_registration, only: [:show]
+
+  def index
+    @registrations = Registration.all
+  end
+
+  def show
+    @registration = Registration.find(params[:id])
+  end
 
   def new
     @registration = Registration.new
@@ -21,5 +30,9 @@ class RegistrationsController < ApplicationController
 
   def set_event
     @event = Event.find(params[:event_id])
+  end
+
+  def set_registration
+    @registration = Registration.find(params[:id])
   end
 end

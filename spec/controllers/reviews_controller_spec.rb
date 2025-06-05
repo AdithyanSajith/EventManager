@@ -1,7 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe ReviewsController, type: :controller do
+  include Devise::Test::ControllerHelpers
+
+  let!(:user) { create(:user) }
   let!(:review) { create(:review) }
+
+  before { sign_in user }
 
   describe 'GET #index' do
     it 'returns a successful response' do
@@ -26,6 +31,4 @@ RSpec.describe ReviewsController, type: :controller do
       expect(assigns(:review)).to eq(review)
     end
   end
-
-  # Add more specs for create, update, destroy, etc. as needed
 end

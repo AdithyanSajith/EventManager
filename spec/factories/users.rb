@@ -1,16 +1,18 @@
 FactoryBot.define do
   factory :user do
-    email { "user@example.com" }
-    password { "password123" }
+    sequence(:email) { |n| "user#{n}@example.com" }
+    password { "password" }
     role { "participant" }
-    name { "Test User" }
-    interest { "Music" }
-    city { "Test City" }
-    birthdate { Date.today - 20.years }
-    number { "1234567890" }
-    organisation { "Test Org" }
-    website { "https://test.org" }
-    bio { "Test bio" }
     association :userable, factory: :participant
+
+    trait :host do
+      role { "host" }
+      association :userable, factory: :host
+    end
+
+    trait :participant do
+      role { "participant" }
+      association :userable, factory: :participant
+    end
   end
 end

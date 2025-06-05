@@ -4,6 +4,14 @@ class PaymentsController < ApplicationController
   before_action :authorize_participant!
   before_action :set_event
 
+  def index
+    @payments = Payment.all
+  end
+
+  def show
+    @payment = Payment.find(params[:id])
+  end
+
   def new
     participant = current_resource_owner.userable
     unless participant
@@ -56,6 +64,21 @@ class PaymentsController < ApplicationController
     end
   end
 
+  def update
+    @payment = Payment.find(params[:id])
+    if @payment.update(payment_params)
+      redirect_to @payment
+    else
+      render :edit
+    end
+  end
+
+  def destroy
+    @payment = Payment.find(params[:id])
+    @payment.destroy
+    redirect_to payments_path
+  end
+
   private
 
   def set_event
@@ -63,7 +86,7 @@ class PaymentsController < ApplicationController
   end
 
   def payment_params
-    params.require(:payment).permit(:amount, :card_number)
+    params.require(:payment).permit(:registration_id, :amount, :card_number, :paid_at)
   end
 
   def authorize_participant!

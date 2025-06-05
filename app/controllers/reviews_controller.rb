@@ -4,11 +4,11 @@ class ReviewsController < ApplicationController
   before_action :set_reviewable, only: %i[new create] # find target of review
 
   def index
-    @reviews = Review.all.includes(:participant, :reviewable)
+    @reviews = Review.all
   end
 
   def show
-    Rails.logger.debug "📦 ReviewsController#show called with id=#{params[:id]}"
+    @review = Review.find(params[:id])
   end
 
   def new
