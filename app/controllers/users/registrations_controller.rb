@@ -14,7 +14,7 @@ module Users
           if required.any?(&:blank?)
             flash.now[:alert] = "All host fields (organisation, website, bio, number) must be present."
             clean_up_passwords resource
-            respond_with resource and return
+            render :new, status: :unprocessable_entity and return
           end
           userable = Host.new(
             organisation: resource.organisation,
@@ -27,7 +27,7 @@ module Users
           if required.any?(&:blank?)
             flash.now[:alert] = "All participant fields (name, interest, city, birthdate) must be present."
             clean_up_passwords resource
-            respond_with resource and return
+            render :new, status: :unprocessable_entity and return
           end
           userable = Participant.new(
             name: resource.name,
@@ -38,7 +38,7 @@ module Users
         else
           flash.now[:alert] = "Invalid role selected."
           clean_up_passwords resource
-          respond_with resource and return
+          render :new, status: :unprocessable_entity and return
         end
 
         ActiveRecord::Base.transaction do
@@ -60,11 +60,11 @@ module Users
       rescue ActiveRecord::RecordInvalid => e
         flash.now[:alert] = e.record.errors.full_messages.to_sentence.presence || e.message
         clean_up_passwords resource
-        respond_with resource
+        render :new, status: :unprocessable_entity
       rescue => e
         flash.now[:alert] = e.message.presence || "Registration failed."
         clean_up_passwords resource
-        respond_with resource
+        render :new, status: :unprocessable_entity
       end
     end
 

@@ -2,15 +2,9 @@
 
 <% if @events.any? %>
   <% @events.each do |event| %>
+    <%= render partial: "event", locals: { event: event } %>
     <div style="margin-bottom: 20px; border: 1px solid #ccc; padding: 10px;">
-      <p><strong>Title:</strong> <%= event.title %></p>
-      <p><strong>Description:</strong> <%= event.description %></p>
-      <p><strong>Starts at:</strong> <%= event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
-      <p><strong>Ends at:</strong> <%= event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
-      <p><strong>Venue:</strong> <%= event.venue.name if event.venue %></p>
-      <p><strong>Category:</strong> <%= event.category.name if event.category %></p>
-
-      <%= link_to "View & Pay", event_path(event), class: "btn btn-primary" %>
+      <!-- Additional controls can go here if needed -->
     </div>
   <% end %>
 <% else %>

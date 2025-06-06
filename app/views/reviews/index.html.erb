@@ -1,9 +1,4 @@
 <h2>All Reviews</h2>
 <% @reviews.each do |review| %>
-  <div class="card mb-3">
-    <div class="card-body">
-      <p><strong><%= review.participant.name %>:</strong> <%= review.comment %> (⭐ <%= review.rating %>)</p>
-      <p><em>Reviewed: <%= review.reviewable_type %> - <%= review.reviewable.try(:title) || review.reviewable.try(:name) %></em></p>
-    </div>
-  </div>
+  <%= render partial: "review", locals: { review: review } %>
 <% end %>

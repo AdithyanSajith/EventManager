@@ -7,11 +7,19 @@ class Host < ApplicationRecord
   validates :bio, presence: true
   validates :number, numericality: { only_integer: true }, length: { is: 10 }
 
+  before_validation :set_default_bio
+
   def self.ransackable_attributes(auth_object = nil)
     %w[id bio organisation website number created_at updated_at]
   end
 
   def self.ransackable_associations(auth_object = nil)
     %w[user events venues]
+  end
+
+  private
+
+  def set_default_bio
+    self.bio ||= 'No bio provided.'
   end
 end

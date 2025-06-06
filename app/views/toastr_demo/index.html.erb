@@ -1,0 +1,167 @@
+<%# Views for demonstrating toastr notifications %>
+<h1 class="mb-4">Notification System Demo</h1>
+
+<ul class="nav nav-tabs mb-4" id="notificationTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="toast-tab" data-bs-toggle="tab" data-bs-target="#toast-content" 
+            type="button" role="tab" aria-controls="toast-content" aria-selected="true">
+      Standard Toasts
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="snackbar-tab" data-bs-toggle="tab" data-bs-target="#snackbar-content" 
+            type="button" role="tab" aria-controls="snackbar-content" aria-selected="false">
+      Snackbar Notifications
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content" id="notificationTabContent">
+  <!-- Standard Toasts Tab -->
+  <div class="tab-pane fade show active" id="toast-content" role="tabpanel" aria-labelledby="toast-tab">
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        Standard Toast Notifications
+      </div>
+      <div class="card-body">
+        <p>Click buttons below to trigger different notification styles:</p>
+        
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <%= link_to "Success Notification", toastr_demo_trigger_path(type: 'success'), 
+              class: "btn btn-success" %>
+              
+          <%= link_to "Info Notification", toastr_demo_trigger_path(type: 'info'), 
+              class: "btn btn-info" %>
+              
+          <%= link_to "Warning Notification", toastr_demo_trigger_path(type: 'warning'), 
+              class: "btn btn-warning" %>
+              
+          <%= link_to "Error Notification", toastr_demo_trigger_path(type: 'error'), 
+              class: "btn btn-danger" %>
+              
+          <%= link_to "Show All Types", toastr_demo_trigger_path(type: 'all'), 
+              class: "btn btn-dark" %>
+              
+          <%= link_to "HTML Content", toastr_demo_trigger_path(type: 'html'), 
+              class: "btn btn-secondary" %>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Snackbar Notifications Tab -->
+  <div class="tab-pane fade" id="snackbar-content" role="tabpanel" aria-labelledby="snackbar-tab">
+    <div class="card mb-4">
+      <div class="card-header bg-success text-white">
+        Snackbar Notifications
+      </div>
+      <div class="card-body">
+        <p>Snackbar notifications appear at the bottom of the screen:</p>
+        
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <%= link_to "Success Snackbar", toastr_demo_trigger_path(type: 'success', style: 'snackbar'), 
+              class: "btn btn-success" %>
+              
+          <%= link_to "Info Snackbar", toastr_demo_trigger_path(type: 'info', style: 'snackbar'), 
+              class: "btn btn-info" %>
+              
+          <%= link_to "Warning Snackbar", toastr_demo_trigger_path(type: 'warning', style: 'snackbar'), 
+              class: "btn btn-warning" %>
+              
+          <%= link_to "Error Snackbar", toastr_demo_trigger_path(type: 'error', style: 'snackbar'), 
+              class: "btn btn-danger" %>
+              
+          <%= link_to "Show All Types", toastr_demo_trigger_path(type: 'all', style: 'snackbar'), 
+              class: "btn btn-dark" %>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card mb-4">
+      <div class="card-header bg-info text-white">
+        Simulate Action Snackbars
+      </div>
+      <div class="card-body">
+        <p>See how snackbars appear after different actions:</p>
+        
+        <div class="d-flex flex-wrap gap-2">
+          <%= link_to "Payment Successful", toastr_demo_trigger_path(type: 'payment'), 
+              class: "btn btn-outline-success" %>
+              
+          <%= link_to "Event Registration", toastr_demo_trigger_path(type: 'registration'), 
+              class: "btn btn-outline-primary" %>
+              
+          <%= link_to "Review Submitted", toastr_demo_trigger_path(type: 'review'), 
+              class: "btn btn-outline-info" %>
+              
+          <%= link_to "Ticket Issued", toastr_demo_trigger_path(type: 'ticket'), 
+              class: "btn btn-outline-secondary" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header bg-success text-white">
+    Advanced Notification Types
+  </div>
+  <div class="card-body">
+    <p>Examples of more complex notification patterns:</p>
+    
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-primary" onclick="<%= toastr_sticky('info', 'This is a sticky notification that will not auto-dismiss.', 'Sticky Notification') %>">
+        Show Sticky Notification
+      </button>
+      
+      <button class="btn btn-warning" onclick="<%= toastr_countdown('warning', 'This notification will auto-dismiss in:', 10) %>">
+        Show Countdown Notification
+      </button>
+      
+      <button class="btn btn-info" onclick="<%= toastr_confirmation('Are you sure you want to continue?', '#', 'Yes, proceed', 'Cancel') %>">
+        Show Confirmation Dialog
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header bg-info text-white">
+    Notification Position Demo
+  </div>
+  <div class="card-body">
+    <p>Test notifications with different positions:</p>
+    
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-outline-primary" onclick="showToastPosition('toast-top-right')">Top Right</button>
+      <button class="btn btn-outline-primary" onclick="showToastPosition('toast-bottom-right')">Bottom Right</button>
+      <button class="btn btn-outline-primary" onclick="showToastPosition('toast-bottom-left')">Bottom Left</button>
+      <button class="btn btn-outline-primary" onclick="showToastPosition('toast-top-left')">Top Left</button>
+      <button class="btn btn-outline-primary" onclick="showToastPosition('toast-top-full-width')">Top Full Width</button>
+      <button class="btn btn-outline-primary" onclick="showToastPosition('toast-bottom-full-width')">Bottom Full Width</button>
+      <button class="btn btn-outline-primary" onclick="showToastPosition('toast-top-center')">Top Center</button>
+      <button class="btn btn-outline-primary" onclick="showToastPosition('toast-bottom-center')">Bottom Center</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showToastPosition(position) {
+    // Store current position
+    const currentPosition = toastr.options.positionClass;
+    
+    // Change position for this notification
+    toastr.options.positionClass = position;
+    
+    // Show notification
+    toastr.info('This notification appears in the ' + position + ' position');
+    
+    // Restore original position
+    setTimeout(() => {
+      toastr.options.positionClass = currentPosition;
+    }, 500);
+  }
+</script>
+
+<%# Also display the helper widget for quick testing %>
+<%= show_toastr_examples if defined?(show_toastr_examples) %>

@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :host do
     organisation { "Test Org" }
     website { "https://test.org" }
+    number { "1234567890" }
     bio { "Test bio" }
-    sequence(:number) { |n| "12345678#{format('%02d', n % 100)}" } # Ensure 10 digits and uniqueness
   end
 end

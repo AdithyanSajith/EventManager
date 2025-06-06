@@ -27,6 +27,11 @@ class HostsController < ApplicationController
   helper_method :current_resource_owner
 
   def ensure_host!
+    if current_resource_owner.is_a?(AdminUser)
+      # Admin users have access to all areas
+      return
+    end
+    
     unless current_resource_owner&.role == "host" && 
            current_resource_owner.userable_type == "Host" && 
            current_resource_owner.userable.present?

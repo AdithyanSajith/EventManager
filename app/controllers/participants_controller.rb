@@ -70,10 +70,17 @@ class ParticipantsController < ApplicationController
 
   private
 
-  # Ensure the user is a participant
+  # Ensure the user is a participant or an admin
   def authorize_participant!
-    unless current_resource_owner&.role == "participant"
-      redirect_to root_path, alert: "Only participants can access this page."
+    # Allow admin users automatic access
+    if current_resource_owner.is_a?(AdminUser)
+      return true
+    end
+    
+    # For regular users, check for participant role
+    unless current_resource_owner.is_a?(User) && current_resource_owner.role == "participant"
+      render_flash_message(:error, "Only participants can access this page.")
+      redirect_to root_path
     end
   end
 

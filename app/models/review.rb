@@ -19,8 +19,13 @@ class Review < ApplicationRecord
 
   def update_event_rating
     # Update event's rating logic
-    event = self.reviewable
-    event.update_rating if event.is_a?(Event)
-    Rails.logger.info "Event rating updated for event: #{event.title}"
+    reviewable_object = self.reviewable
+    if reviewable_object.is_a?(Event)
+      reviewable_object.update_rating
+      Rails.logger.info "Event rating updated for event: #{reviewable_object.title}"
+    elsif reviewable_object.respond_to?(:update_rating)
+      reviewable_object.update_rating
+      Rails.logger.info "Rating updated for #{reviewable_object.class.name}"
+    end
   end
 end

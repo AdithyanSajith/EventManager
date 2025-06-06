@@ -13,13 +13,13 @@ class Users::SessionsController < Devise::SessionsController
     self.resource = warden.authenticate(auth_options)
     if resource
       set_flash_message!(:notice, :signed_in)
-      flash[:notice] = "Login successful!"
+      render_flash_message(:success, "Login successful!")
       sign_in(resource_name, resource)
       yield resource if block_given?
       respond_with resource, location: after_sign_in_path_for(resource)
     else
       # Custom flash for invalid login
-      flash[:error] = "Incorrect email or password."
+      render_flash_message(:error, "Incorrect email or password.")
       redirect_to new_session_path(resource_name)
     end
   end
@@ -27,7 +27,7 @@ class Users::SessionsController < Devise::SessionsController
   # DELETE /resource/sign_out
   def destroy
     signed_out = (Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name))
-    flash[:notice] = "Logout successful!"
+    render_flash_message(:success, "Logout successful!")
     yield if block_given?
     respond_to_on_destroy
   end

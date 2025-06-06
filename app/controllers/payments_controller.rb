@@ -1,4 +1,5 @@
 class PaymentsController < ApplicationController
+  layout "application"
   # Use Devise's authenticate_user! for web-based authentication
   before_action :authenticate_user!
   before_action :authorize_participant!
@@ -9,7 +10,11 @@ class PaymentsController < ApplicationController
   end
 
   def show
-    @payment = Payment.find(params[:id])
+    begin
+      @payment = Payment.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      redirect_to root_path, alert: "Payment not found."
+    end
   end
 
   def new
@@ -48,18 +53,32 @@ class PaymentsController < ApplicationController
     @payment = @registration.build_payment(payment_params)
 
     if @payment.save
+      ticket_issued = false
       unless @registration.ticket
-        Ticket.create!(
+        ticket = Ticket.create!(
           registration: @registration,
           ticket_number: SecureRandom.hex(6),
           issued_at: Time.current
         )
+        ticket_issued = true
       end
 
-      flash[:notice] = "✅ Payment successful and ticket issued!"
-      redirect_to filtered_events_path
+      # Standard flash message for page reload
+      render_flash_message(:success, "Payment successful and ticket issued!")
+      
+      # Store success message for snackbar in session
+      message = ticket_issued ? "Payment successful and ticket issued!" : "Payment successful!"
+      session[:payment_snackbar] = { action: :success, details: message }
+      
+      # Redirect to ticket page instead of filtered events
+      redirect_to ticket_path(@registration.ticket)
     else
-      flash.now[:alert] = @payment.errors.full_messages.to_sentence
+      # Standard flash message
+      render_flash_message(:error, @payment.errors.full_messages.to_sentence)
+      
+      # Snackbar message shown immediately
+      @snackbar_js = payment_snackbar(:error, @payment.errors.full_messages.to_sentence)
+      
       render :new, status: :unprocessable_entity
     end
   end
@@ -90,8 +109,15 @@ class PaymentsController < ApplicationController
   end
 
   def authorize_participant!
-    unless current_resource_owner.role == "participant"
-      redirect_to root_path, alert: "Only participants can make payments."
+    # Allow admin users automatic access
+    if current_resource_owner.is_a?(AdminUser)
+      return true
+    end
+    
+    # For regular users, check for participant role
+    unless current_resource_owner.is_a?(User) && current_resource_owner.role == "participant"
+      render_flash_message(:error, "Only participants can make payments.")
+      redirect_to root_path
     end
   end
 end

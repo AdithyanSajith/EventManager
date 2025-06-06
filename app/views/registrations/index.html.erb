@@ -6,7 +6,7 @@
 
 <div id="registrations">
   <% @registrations.each do |registration| %>
-    <%= render registration %>
+    <%= render partial: "registration", locals: { registration: registration } %>
     <p>
       <%= link_to "Show this registration", registration %>
     </p>

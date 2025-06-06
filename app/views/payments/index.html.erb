@@ -6,7 +6,7 @@
 
 <div id="payments">
   <% @payments.each do |payment| %>
-    <%= render payment %>
+    <%= render partial: "payment", locals: { payment: payment } %>
     <p>
       <%= link_to "Show this payment", payment %>
     </p>

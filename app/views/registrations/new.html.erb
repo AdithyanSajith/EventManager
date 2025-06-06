@@ -1,11 +1,36 @@
-<% content_for :title, "New registration" %>
+<% content_for :title, (@event ? "Register for "+@event.title : "Register for Event") %>
 
-<h1>New registration</h1>
-
-<%= render "form", registration: @registration %>
-
-<br>
-
-<div>
-  <%= link_to "Back to registrations", registrations_path %>
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h2 class="mb-0">Register for Event</h2>
+        </div>
+        <div class="card-body">
+          <% if @event %>
+            <div class="event-details mb-4">
+              <h3 class="text-primary"><%= @event.title %></h3>
+              <p class="text-muted"><%= @event.description %></p>
+              <p><strong>Date:</strong> <%= @event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
+              <p><strong>Location:</strong> <%= @event.venue.name %></p>
+            </div>
+            <div class="alert alert-info">
+              <p>By registering for this event, you confirm that you'll be able to attend. After registration, you'll need to make a payment to secure your spot.</p>
+            </div>
+            <%= form_with(url: event_registrations_path(@event), method: :post) do |form| %>
+              <div class="d-grid gap-2 mt-4">
+                <%= form.submit "Confirm Registration", class: "btn btn-primary btn-lg" %>
+                <%= link_to "Cancel", event_path(@event), class: "btn btn-outline-secondary mt-2" %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="alert alert-warning">
+              <p>No event selected. Please go back and choose an event to register for.</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

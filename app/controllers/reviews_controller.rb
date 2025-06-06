@@ -1,7 +1,10 @@
 class ReviewsController < ApplicationController
+  layout "application"
+
   before_action :set_review, only: %i[show edit update destroy]
   before_action :authorize_participant!
   before_action :set_reviewable, only: %i[new create] # find target of review
+  before_action :ensure_has_ticket_for_event, only: %i[new create]
 
   def index
     @reviews = Review.all
@@ -21,9 +24,24 @@ class ReviewsController < ApplicationController
     @review.participant = current_resource_owner.userable
 
     if @review.save
-      redirect_to @reviewable, notice: "Review submitted!"
+      # Standard flash message
+      render_flash_message(:success, "Review submitted!")
+
+      # Store snackbar data in session
+      reviewable_name = @reviewable.respond_to?(:title) ? @reviewable.title : @reviewable.name
+      session[:review_snackbar] = {
+        action: :submitted,
+        details: "Thank you for reviewing #{reviewable_name}"
+      }
+
+      redirect_to @reviewable
     else
-      flash.now[:alert] = @review.errors.full_messages.to_sentence
+      # Standard flash message
+      render_flash_message(:error, @review.errors.full_messages.to_sentence)
+
+      # Immediate snackbar
+      @snackbar_js = review_snackbar(:error, @review.errors.full_messages.to_sentence)
+
       render :new, status: :unprocessable_entity
     end
   end
@@ -32,15 +50,41 @@ class ReviewsController < ApplicationController
 
   def update
     if @review.update(review_params)
-      redirect_to @review.reviewable, notice: "Review updated."
+      # Standard flash message
+      render_flash_message(:success, "Review updated.")
+
+      # Store snackbar data in session
+      reviewable_name = @review.reviewable.respond_to?(:title) ? @review.reviewable.title : @review.reviewable.name
+      session[:review_snackbar] = {
+        action: :updated,
+        details: "Your review of #{reviewable_name} was updated"
+      }
+
+      redirect_to @review.reviewable
     else
+      # Immediate snackbar
+      @snackbar_js = review_snackbar(:error, @review.errors.full_messages.to_sentence)
+
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
+    reviewable = @review.reviewable
+    reviewable_name = reviewable.respond_to?(:title) ? reviewable.title : reviewable.name
+
     @review.destroy!
-    redirect_to reviews_path, status: :see_other, notice: "Review was deleted."
+
+    # Standard flash message
+    render_flash_message(:success, "Review was deleted.")
+
+    # Store snackbar data in session
+    session[:review_snackbar] = {
+      action: :deleted,
+      details: "Your review of #{reviewable_name} was deleted"
+    }
+
+    redirect_to reviews_path, status: :see_other
   end
 
   private
@@ -71,6 +115,25 @@ class ReviewsController < ApplicationController
   end
 
   def authorize_participant!
-    redirect_to root_path, alert: "Only participants can review." unless current_resource_owner&.role == "participant"
+    # Allow admin users automatic access
+    if current_resource_owner.is_a?(AdminUser)
+      return true
+    end
+
+    # For regular users, check for participant role
+    unless current_resource_owner.is_a?(User) && current_resource_owner.role == "participant"
+      render_flash_message(:error, "Only participants can review.")
+      redirect_to root_path
+    end
+  end
+
+  def ensure_has_ticket_for_event
+    return if current_resource_owner.is_a?(AdminUser)
+    return unless @reviewable.is_a?(Event)
+    registration = current_resource_owner.userable.registrations.find_by(event_id: @reviewable.id)
+    unless registration&.ticket.present?
+      render_flash_message(:error, "You must have a ticket for this event to write a review.")
+      redirect_to event_path(@reviewable)
+    end
   end
 end

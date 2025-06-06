@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  include SnackbarNotifier
+  
   protect_from_forgery with: :exception, unless: -> {
     request.format.json? || request.format.turbo_stream?
   } #Enable CSRF protection for all except JSON and Turbo Stream requests
@@ -60,12 +62,45 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # For Devise redirection
   def storable_location?
     request.get? && is_navigational_format? && !devise_controller? && !request.xhr?
   end
 
   def store_user_location!
-    store_location_for(:user, request.fullpath)
+    store_location_for(:user, request.fullpath) if storable_location?
+  end
+
+  # Current user handling
+  def current_resource_owner
+    current_admin_user || current_user
+  end
+
+  # Enhanced flash notifications for toastr
+  def flash_message(type, text)
+    flash[type] ||= []
+    flash[type] << text
+  end
+
+  def render_flash_message(type, text, as_snackbar = false)
+    # Apply snackbar suffix if requested
+    type = "#{type}_snackbar".to_sym if as_snackbar
+    
+    case type
+    when :notice, :success, :success_snackbar
+      flash_message(as_snackbar ? :success_snackbar : :success, text)
+    when :alert, :error, :error_snackbar
+      flash_message(as_snackbar ? :error_snackbar : :error, text)
+    when :warning, :warning_snackbar
+      flash_message(as_snackbar ? :warning_snackbar : :warning, text)
+    else
+      flash_message(as_snackbar ? :info_snackbar : :info, text)
+    end
+  end
+  
+  # Helper specifically for snackbar-style notifications
+  def render_snackbar(type, text)
+    render_flash_message(type, text, true)
   end
 
   # Handle 404

@@ -1,4 +1,5 @@
 class EventsController < ApplicationController
+  layout "application"
   before_action :authenticate_resource_owner!, except: [:show]
   before_action :set_event, only: [:show, :edit, :update, :destroy]
   before_action :authorize_host!, only: [:new, :create, :edit, :update, :destroy, :index, :other_events]
@@ -15,7 +16,8 @@ class EventsController < ApplicationController
   def create
     @event = current_resource_owner.userable.events.build(event_params)
     if @event.save
-      redirect_to @event, notice: "Event was successfully created."
+      render_flash_message(:success, "Event was successfully created.")
+      redirect_to @event
     else
       render :new, status: :unprocessable_entity
     end
@@ -24,48 +26,100 @@ class EventsController < ApplicationController
   def show
     @event = Event.find(params[:id])
     # Allow anyone to view event details, but only show registration/payment/ticket if logged in and authorized
-    if user_signed_in?
-      if current_resource_owner.role == "participant"
-        @registration = current_resource_owner.userable.registrations.find_by(event_id: @event.id)
-        @payment = @registration&.payment
-        @ticket = @registration&.ticket
-      elsif current_resource_owner.role == "host" && current_resource_owner.userable == @event.host
+    if user_signed_in? || current_admin_user
+      # Admin users can see all registrations
+      if current_resource_owner.is_a?(AdminUser)
         @registrations = @event.registrations.includes(:user)
+      # For regular users, show appropriate information based on role
+      elsif current_resource_owner.is_a?(User)
+        if current_resource_owner.role == "participant"
+          @registration = current_resource_owner.userable.registrations.find_by(event_id: @event.id)
+          @payment = @registration&.payment
+          @ticket = @registration&.ticket
+        elsif current_resource_owner.role == "host" && current_resource_owner.userable == @event.host
+          @registrations = @event.registrations.includes(:user)
+        end
       end
     end
     # Render show view for all users (even if not logged in)
   end
 
   def filtered
-    @events = Event.where(category_id: current_resource_owner.interest).includes(:venue, :reviews)
+    if current_resource_owner.is_a?(AdminUser)
+      # Admin users see all events
+      @events = Event.all.includes(:venue, :reviews)
+    elsif current_resource_owner.is_a?(User) && current_resource_owner.role == "participant"
+      # Participants see events in their interest category
+      @events = Event.where(category_id: current_resource_owner.interest).includes(:venue, :reviews)
+    else
+      # Default to all events if there's any issue
+      @events = Event.all.includes(:venue, :reviews)
+    end
   end
 
   def other_events
-    @events = Event.where.not(host_id: current_resource_owner.userable.id)
+    if current_resource_owner.is_a?(AdminUser)
+      # Admin users see all events
+      @events = Event.all
+    elsif current_resource_owner.is_a?(User) && current_resource_owner.userable_type == "Host"
+      # For hosts, show events from other hosts
+      @events = Event.where.not(host_id: current_resource_owner.userable.id)
+    else
+      # Default for other user types
+      @events = Event.all
+    end
   end
 
   def edit
-    redirect_to events_path, alert: "You can only edit your own events." unless current_resource_owner.userable == @event.host
+    # Admin users can edit any event
+    if current_resource_owner.is_a?(AdminUser)
+      return # Allow access
+    end
+    
+    # Regular users can only edit their own events
+    unless current_resource_owner.is_a?(User) && current_resource_owner.userable == @event.host
+      render_flash_message(:error, "You can only edit your own events.")
+      redirect_to events_path
+    end
   end
 
   def update
-    if current_resource_owner.userable == @event.host
+    # Admin users can update any event
+    if current_resource_owner.is_a?(AdminUser)
       if @event.update(event_params)
-        redirect_to @event, notice: "Event was successfully updated."
+        render_flash_message(:success, "Event was successfully updated.")
+        redirect_to @event
+      else
+        render :edit, status: :unprocessable_entity
+      end
+    # Regular users can only update their own events  
+    elsif current_resource_owner.is_a?(User) && current_resource_owner.userable == @event.host
+      if @event.update(event_params)
+        render_flash_message(:success, "Event was successfully updated.")
+        redirect_to @event
       else
         render :edit, status: :unprocessable_entity
       end
     else
-      redirect_to events_path, alert: "You can only update your own events."
+      render_flash_message(:error, "You can only update your own events.")
+      redirect_to events_path
     end
   end
 
   def destroy
-    if current_resource_owner.userable == @event.host
+    # Admin users can delete any event
+    if current_resource_owner.is_a?(AdminUser)
       @event.destroy
-      redirect_to events_path, notice: "Event deleted successfully."
+      render_flash_message(:success, "Event deleted successfully.")
+      redirect_to events_path
+    # Regular users can only delete their own events
+    elsif current_resource_owner.is_a?(User) && current_resource_owner.userable == @event.host
+      @event.destroy
+      render_flash_message(:success, "Event deleted successfully.")
+      redirect_to events_path
     else
-      redirect_to events_path, alert: "You are not authorized to delete this event."
+      render_flash_message(:error, "You are not authorized to delete this event.")
+      redirect_to events_path
     end
   end
 
@@ -80,12 +134,31 @@ class EventsController < ApplicationController
   end
 
   def authorize_host!
-    unless current_resource_owner&.role == "host" && current_resource_owner&.userable_type == "Host"
-      redirect_to root_path, alert: "Only hosts can access this page."
+    # Allow admin users automatic access
+    if current_resource_owner.is_a?(AdminUser)
+      return true
+    end
+    
+    # For regular users, check for host role
+    unless current_resource_owner&.is_a?(User) && 
+           current_resource_owner&.role == "host" && 
+           current_resource_owner&.userable_type == "Host"
+      render_flash_message(:error, "Only hosts can access this page.")
+      redirect_to root_path
     end
   end
 
   def authorize_participant!
-    redirect_to root_path, alert: "Only participants can access this section." unless current_resource_owner&.role == "participant"
+    # Allow admin users automatic access
+    if current_resource_owner.is_a?(AdminUser)
+      return true
+    end
+    
+    # For regular users, check for participant role
+    unless current_resource_owner&.is_a?(User) && 
+           current_resource_owner&.role == "participant"
+      render_flash_message(:error, "Only participants can access this section.")
+      redirect_to root_path
+    end
   end
 end

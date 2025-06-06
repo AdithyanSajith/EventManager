@@ -9,13 +9,17 @@
       <p><strong>Venue:</strong> <%= @event.venue.name %></p>
       <p><strong>Category:</strong> <%= @event.category.name %></p>
 
-      <% if current_resource_owner&.role == "participant" %>
+      <% if current_resource_owner.is_a?(AdminUser) || current_resource_owner&.role == "participant" %>
         <% registration = @registration %>
         <% ticket = @ticket %>
 
         <% if ticket.present? %>
           <div class="alert alert-success mt-4">
             <h4>Your Ticket</h4>
+            <div class="d-flex gap-2 mb-3">
+              <%= link_to "🎟️ View Ticket", ticket_path(ticket), class: "btn btn-success" %>
+              <%= link_to "✍️ Write a Review", new_event_review_path(@event), class: "btn btn-outline-primary" %>
+            </div>
             <p><strong>Ticket Number:</strong> <%= ticket.ticket_number %></p>
             <p><strong>Issued At:</strong> <%= ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
           </div>
@@ -25,11 +29,11 @@
             <%= link_to "💳 Complete Payment", new_event_payment_path(@event), class: "btn btn-primary mt-2" %>
           </div>
         <% else %>
-          <%= link_to "💳 Register & Pay", new_event_payment_path(@event), class: "btn btn-primary mt-3" %>
+          <%= link_to "📝 Register for this Event", new_event_registration_path(@event), class: "btn btn-primary mt-3" %>
         <% end %>
       <% end %>
 
-      <% if current_resource_owner&.role == "host" && current_resource_owner.userable == @event.host %>
+      <% if current_resource_owner.is_a?(AdminUser) || (current_resource_owner&.role == "host" && current_resource_owner.userable == @event.host) %>
         <div class="d-flex gap-2 mt-4">
           <%= link_to "✏️ Edit Event", edit_event_path(@event), class: "btn btn-outline-warning btn-sm" %>
           <%= button_to "🗑️ Delete Event", event_path(@event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-outline-danger btn-sm" %>
@@ -57,7 +61,7 @@
       <p class="text-muted">No reviews yet for this event.</p>
     <% end %>
 
-    <% if current_resource_owner&.role == "participant" %>
+    <% if current_resource_owner.is_a?(AdminUser) %>
       <%= link_to "✍️ Write a Review", new_event_review_path(@event), class: "btn btn-outline-primary mt-3" %>
     <% end %>
   </div>

@@ -24,6 +24,11 @@ Rails.application.routes.draw do
   get   '/filtered_events',  to: 'events#filtered',              as: :filtered_events
 
   get '/other_events', to: 'events#other_events', as: :other_events
+  
+  # Toastr demo routes for testing notifications
+  get '/toastr_demo', to: 'toastr_demo#index', as: :toastr_demo
+  get '/toastr_demo/trigger/:type', to: 'toastr_demo#trigger', as: :toastr_demo_trigger
+  get '/toastr_demo/simulate/:action_type', to: 'toastr_demo#simulate_action', as: :toastr_demo_simulate
 
   resources :events do
     resources :payments, only: [:new, :create]

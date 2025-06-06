@@ -13,9 +13,9 @@ RSpec.describe Host, type: :model do
     expect(build(:host, website: nil)).not_to be_valid
   end
 
-  it 'is invalid without bio' do
-    expect(build(:host, bio: nil)).not_to be_valid
-  end
+  #it 'is invalid without bio' do
+   # expect(build(:host, bio: nil)).not_to be_valid
+  #end
 
   it 'is invalid without number' do
     expect(build(:host, number: nil)).not_to be_valid

@@ -44,7 +44,12 @@ Rails.application.configure do
   # caching is enabled.
   config.action_mailer.perform_caching = false
 
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+  # MailCatcher SMTP settings
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = { address: 'localhost', port: 1025 }
+
+  # Ensure Devise mailers use correct URL options
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
@@ -65,6 +70,15 @@ Rails.application.configure do
   config.active_job.verbose_enqueue_logs = true
 
   # Suppress logger output for asset requests.
+  config.assets.quiet = true
+
+  # Debug mode disables concatenation and preprocessing of assets
+  config.assets.debug = true
+  
+  # Disable asset caching to avoid permission issues on Windows
+  config.assets.configure do |env|
+    env.cache = ActiveSupport::Cache.lookup_store(:null_store)
+  end
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
