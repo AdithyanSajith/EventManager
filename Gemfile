@@ -78,6 +78,7 @@ gem 'sprockets-rails'
 gem "sassc-rails"
 gem 'doorkeeper'
 gem 'toastr-rails'
+gem 'icalendar'
 
 
 

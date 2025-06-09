@@ -68,4 +68,6 @@ Rails.application.routes.draw do
       get 'user_registered_events', to: 'events/registrations#user_registered_events'
     end
   end
+
+  get 'events/:id/download_ics', to: 'events#download_ics', as: :download_event_ics
 end

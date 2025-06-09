@@ -1,57 +1,47 @@
 <% if @events.any? %>
   <% @events.each do |event| %>
-    <%= render partial: "event", locals: { event: event } %>
-    <% participant = current_resource_owner.userable %>
-    <% registration = participant ? Registration.find_by(participant_id: participant.id, event_id: event.id) : nil %>
-    <% ticket = registration&.ticket %>
-    <% payment = registration&.payment %>
-    <% reviews = event.reviews.includes(:participant).order(created_at: :desc) %>
-
-    <div class="card shadow-sm mb-4">
-      <div class="card-body">
-        <h5 class="card-title"><%= event.title %></h5>
-        <p class="card-text"><%= event.description %></p>
-
-        <p class="card-text">
-          <strong>Starts At:</strong> <%= event.starts_at.strftime("%B %d, %Y %I:%M %p") %><br>
-          <strong>Ends At:</strong> <%= event.ends_at.strftime("%B %d, %Y %I:%M %p") %>
-        </p>
-
-        <% if event.venue.present? %>
-          <p class="card-text"><strong>Location:</strong> <%= event.venue.name %></p>
-        <% end %>
-
-        <% if ticket.present? %>
-          <div class="alert alert-success p-2">
-            🎟️ Ticket ID: <%= ticket.id %> | Issued At: <%= ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %>
-          </div>
-          <%= link_to "View Ticket", ticket_path(ticket), class: "btn btn-outline-success btn-sm me-2" %>
-          <%= link_to "Add Review", new_event_review_path(event), class: "btn btn-outline-primary btn-sm" %>
-
-        <% elsif registration.present? %>
-          <div class="alert alert-warning p-2">
-            💳 You are registered but payment is pending.
-          </div>
-          <%= link_to "Complete Payment", new_event_payment_path(event), class: "btn btn-warning btn-sm" %>
-
-        <% else %>
-          <%= link_to "Register & Pay", new_event_payment_path(event), class: "btn btn-primary btn-sm" %>
-        <% end %>
-
-        <% if reviews.any? %>
-          <hr>
-          <h6 class="mt-4">Reviews:</h6>
-          <% reviews.each do |review| %>
-            <div class="border rounded p-2 mb-2 bg-white">
-              <strong><%= review.participant&.name || "Anonymous" %></strong> -
-              <span class="text-muted"><%= review.created_at.strftime("%d %b %Y") %></span><br>
-              ⭐ <strong><%= review.rating %>/5</strong><br>
-              <%= review.comment %>
+    <div class="container my-5">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title text-primary"><%= event.title %></h2>
+          <p class="card-text"><%= event.description %></p>
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>Starts at:</strong> <%= event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
+              <p><strong>Ends at:</strong> <%= event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
             </div>
+            <div class="col-md-6">
+              <p><strong>Venue:</strong> <%= event.venue.name %></p>
+              <p><strong>Category:</strong> <%= event.category.name %></p>
+            </div>
+          </div>
+          <% registration = current_resource_owner.userable.registrations.find_by(event_id: event.id) %>
+          <% ticket = registration&.ticket %>
+          <% if ticket.present? %>
+            <div class="alert alert-success mb-3 mt-3">
+              <strong>Your Ticket is ready!</strong>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <%= link_to "🎟️ View Ticket", ticket_path(ticket), class: "btn btn-success" %>
+              <%= link_to "✍️ Write a Review", new_event_review_path(event), class: "btn btn-outline-primary" %>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <p><strong>Ticket Number:</strong> <%= ticket.ticket_number %></p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Issued At:</strong> <%= ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
+              </div>
+            </div>
+          <% elsif registration.present? %>
+            <div class="alert alert-info mb-3 mt-3">
+              <p>You are registered but have not completed payment.</p>
+            </div>
+            <%= link_to "💳 Complete Payment", new_event_payment_path(event), class: "btn btn-primary" %>
+          <% else %>
+            <%= link_to "📝 Register for this Event", new_event_registration_path(event), class: "btn btn-primary mt-3" %>
           <% end %>
-        <% else %>
-          <p class="text-muted mt-3">No reviews yet.</p>
-        <% end %>
+        </div>
       </div>
     </div>
   <% end %>

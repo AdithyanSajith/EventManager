@@ -123,6 +123,12 @@ class EventsController < ApplicationController
     end
   end
 
+  def download_ics
+    event = Event.find(params[:id])
+    ics_content = helpers.ics_event_content(event)
+    send_data ics_content, filename: "#{event.title.parameterize}.ics", type: 'text/calendar'
+  end
+
   private
 
   def set_event

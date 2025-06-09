@@ -1,0 +1,8 @@
+<h2>Hi <%= @participant.name %>,</h2>
+<p>This is a reminder for your upcoming event:</p>
+<ul>
+  <li><strong>Event:</strong> <%= @event.title %></li>
+  <li><strong>Date:</strong> <%= @event.starts_at.strftime('%B %d, %Y at %I:%M %p') %></li>
+  <li><strong>Location:</strong> <%= @event.venue&.name %></li>
+</ul>
+<p>We look forward to seeing you there!</p>
