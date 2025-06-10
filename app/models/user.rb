@@ -6,8 +6,8 @@ class User < ApplicationRecord
 
   validates :email, presence: true, uniqueness: true
   validates :password, length: { minimum: 6 }, if: :password_required?
-  validates :role, presence: true
-  validate  :userable_presence_check, if: -> { persisted? && role.present? }
+  validates :userable, presence: true
+  validate  :userable_presence_check, if: -> { persisted? && userable.present? }
 
   # Callback to ensure userable is present after creation
   after_create :ensure_userable_association

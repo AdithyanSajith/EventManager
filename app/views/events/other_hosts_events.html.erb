@@ -1,0 +1,24 @@
+<div class="container my-4">
+  <h1 class="text-center">Events Hosted by Other Hosts</h1>
+  <% if @events.any? %>
+    <div class="row">
+      <% @events.each do |event| %>
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+              <h2 class="card-title text-primary"><%= event.title %></h2>
+              <p class="card-text"><%= event.description %></p>
+              <p><strong>Starts at:</strong> <%= event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
+              <p><strong>Ends at:</strong> <%= event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
+              <p><strong>Venue:</strong> <%= event.venue.name %></p>
+              <p><strong>Category:</strong> <%= event.category.name %></p>
+              <%= link_to "View Event", event_path(event), class: "btn btn-primary" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-muted text-center">No events found.</p>
+  <% end %>
+</div>

@@ -1,0 +1,25 @@
+<div class="container my-4">
+  <h1 class="text-center">Events Hosted by You</h1>
+  <% if @events.any? %>
+    <div class="row">
+      <% @events.each do |event| %>
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+              <h2 class="card-title text-primary"><%= event.title %></h2>
+              <p class="card-text"><%= event.description %></p>
+              <p><strong>Starts at:</strong> <%= event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
+              <p><strong>Ends at:</strong> <%= event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
+              <div class="d-flex gap-2">
+                <%= link_to "Edit", edit_event_path(event), class: "btn btn-warning" %>
+                <%= button_to "Delete", event_path(event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-muted text-center">You are not hosting any events.</p>
+  <% end %>
+</div>

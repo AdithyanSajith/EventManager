@@ -54,7 +54,11 @@ class VenuesController < ApplicationController
   end
 
   def ensure_host!
-    unless current_resource_owner&.role == "host" && current_resource_owner.userable_type == "Host"
+    if current_resource_owner.is_a?(AdminUser)
+      return true # Admin users are allowed
+    end
+
+    unless current_resource_owner.is_a?(User) && current_resource_owner.userable_type == "Host"
       redirect_to root_path, alert: "Only hosts can manage venues."
     end
   end

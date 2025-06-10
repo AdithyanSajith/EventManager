@@ -24,6 +24,8 @@ Rails.application.routes.draw do
   get   '/filtered_events',  to: 'events#filtered',              as: :filtered_events
 
   get '/other_events', to: 'events#other_events', as: :other_events
+  get '/past_events', to: 'events#past_events', as: :past_events
+  get '/other_hosts_events', to: 'events#other_hosts_events', as: :other_hosts_events
   
   # Toastr demo routes for testing notifications
   get '/toastr_demo', to: 'toastr_demo#index', as: :toastr_demo
@@ -70,4 +72,5 @@ Rails.application.routes.draw do
   end
 
   get 'events/:id/download_ics', to: 'events#download_ics', as: :download_event_ics
+  get '/hosted_events', to: 'events#hosted', as: :hosted_events
 end

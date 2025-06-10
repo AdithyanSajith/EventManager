@@ -25,6 +25,16 @@
     <%= form.number_field :capacity, class: "form-control", required: true %>
   </div>
 
+  <div class="mb-3">
+    <%= form.label :city, class: "form-label" %>
+    <%= form.text_field :city, class: "form-control", required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :address, class: "form-label" %>
+    <%= form.text_field :address, class: "form-control", required: true %>
+  </div>
+
   <div class="text-center mt-4">
     <%= form.submit venue.persisted? ? "Update Venue" : "Create Venue", class: "btn btn-success px-4 py-2" %>
   </div>

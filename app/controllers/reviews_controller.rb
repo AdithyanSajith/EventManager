@@ -120,9 +120,14 @@ class ReviewsController < ApplicationController
       return true
     end
 
+    # Allow hosts to review venues
+    if current_resource_owner.is_a?(User) && current_resource_owner.userable_type == "Host"
+      return true
+    end
+
     # For regular users, check for participant role
     unless current_resource_owner.is_a?(User) && current_resource_owner.role == "participant"
-      render_flash_message(:error, "Only participants can review.")
+      render_flash_message(:error, "Only participants or hosts can review.")
       redirect_to root_path
     end
   end

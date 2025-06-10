@@ -20,12 +20,12 @@ class ApplicationController < ActionController::Base
   def after_sign_in_path_for(resource)
     return admin_root_path if resource.is_a?(AdminUser)
 
-    case resource.role
-    when 'participant'
+    case resource.userable_type
+    when 'Participant'
       participant = resource.userable
       participant&.interest.blank? ? choose_category_path : filtered_events_path
-    when 'host'
-      host_dashboard_path
+    when 'Host'
+      hosted_events_path
     else
       root_path
     end

@@ -32,11 +32,11 @@ class EventsController < ApplicationController
         @registrations = @event.registrations.includes(:user)
       # For regular users, show appropriate information based on role
       elsif current_resource_owner.is_a?(User)
-        if current_resource_owner.role == "participant"
+        if current_resource_owner.userable_type == "Participant"
           @registration = current_resource_owner.userable.registrations.find_by(event_id: @event.id)
           @payment = @registration&.payment
           @ticket = @registration&.ticket
-        elsif current_resource_owner.role == "host" && current_resource_owner.userable == @event.host
+        elsif current_resource_owner.userable_type == "Host" && current_resource_owner.userable == @event.host
           @registrations = @event.registrations.includes(:user)
         end
       end
@@ -45,15 +45,26 @@ class EventsController < ApplicationController
   end
 
   def filtered
-    if current_resource_owner.is_a?(AdminUser)
-      # Admin users see all events
-      @events = Event.all.includes(:venue, :reviews)
-    elsif current_resource_owner.is_a?(User) && current_resource_owner.role == "participant"
-      # Participants see events in their interest category
-      @events = Event.where(category_id: current_resource_owner.interest).includes(:venue, :reviews)
-    else
-      # Default to all events if there's any issue
-      @events = Event.all.includes(:venue, :reviews)
+    @events = Event.all.includes(:venue, :reviews)
+
+    # Apply filters
+    if params[:category_id].present?
+      @events = @events.where(category_id: params[:category_id])
+    end
+
+    if params[:location].present?
+      @events = @events.joins(:venue).where("venues.location ILIKE ?", "%#{params[:location]}%")
+    end
+
+    if params[:start_date].present? && params[:end_date].present?
+      @events = @events.where("starts_at BETWEEN ? AND ?", params[:start_date], params[:end_date])
+    end
+
+    # Sorting
+    if params[:sort_by] == "popularity"
+      @events = @events.order(registrations_count: :desc)
+    elsif params[:sort_by] == "date"
+      @events = @events.order(starts_at: :asc)
     end
   end
 
@@ -127,6 +138,28 @@ class EventsController < ApplicationController
     event = Event.find(params[:id])
     ics_content = helpers.ics_event_content(event)
     send_data ics_content, filename: "#{event.title.parameterize}.ics", type: 'text/calendar'
+  end
+
+  def past_events
+    @events = Event.where("starts_at < ?", Time.current)
+  end
+
+  def hosted
+    Rails.logger.debug "Current Resource Owner: #{current_resource_owner.inspect}"
+
+    if current_resource_owner.is_a?(AdminUser)
+      @events = Event.all
+    elsif current_resource_owner.is_a?(User) && current_resource_owner.userable_type == "Host"
+      Rails.logger.debug "Host ID: #{current_resource_owner.userable.id}"
+      @events = Event.where(host_id: current_resource_owner.userable.id)
+      Rails.logger.debug "Hosted Events: #{@events.inspect}"
+    else
+      @events = Event.none
+    end
+  end
+
+  def other_hosts_events
+    @events = Event.where.not(host_id: current_resource_owner.userable.id)
   end
 
   private

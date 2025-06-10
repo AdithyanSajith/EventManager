@@ -1,3 +1,57 @@
+<div class="container my-4">
+  <form method="get" action="<%= filtered_events_path %>">
+    <div class="row">
+      <div class="col-md-3">
+        <label for="category_id" class="form-label">Category</label>
+        <select name="category_id" id="category_id" class="form-select">
+          <option value="">All Categories</option>
+          <% Category.all.each do |category| %>
+            <option value="<%= category.id %>"><%= category.name %></option>
+          <% end %>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="venue_id" class="form-label">Venue</label>
+        <select name="venue_id" id="venue_id" class="form-select">
+          <option value="">All Venues</option>
+          <% Venue.all.each do |venue| %>
+            <option value="<%= venue.id %>"><%= venue.name %></option>
+          <% end %>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="address" class="form-label">Address</label>
+        <input type="text" name="address" id="address" class="form-control" placeholder="Enter address">
+      </div>
+      <div class="col-md-3">
+        <label for="city" class="form-label">City</label>
+        <input type="text" name="city" id="city" class="form-control" placeholder="Enter city">
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-md-3">
+        <label for="start_date" class="form-label">Start Date</label>
+        <input type="date" name="start_date" id="start_date" class="form-control">
+      </div>
+      <div class="col-md-3">
+        <label for="end_date" class="form-label">End Date</label>
+        <input type="date" name="end_date" id="end_date" class="form-control">
+      </div>
+      <div class="col-md-3">
+        <label for="sort_by" class="form-label">Sort By</label>
+        <select name="sort_by" id="sort_by" class="form-select">
+          <option value="date">Date</option>
+          <option value="popularity">Popularity</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary mt-4">Search</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<% @events = @events.where("starts_at > ?", Time.current) %>
 <% if @events.any? %>
   <% @events.each do |event| %>
     <div class="container my-5">
@@ -15,31 +69,35 @@
               <p><strong>Category:</strong> <%= event.category.name %></p>
             </div>
           </div>
-          <% registration = current_resource_owner.userable.registrations.find_by(event_id: event.id) %>
-          <% ticket = registration&.ticket %>
-          <% if ticket.present? %>
-            <div class="alert alert-success mb-3 mt-3">
-              <strong>Your Ticket is ready!</strong>
-            </div>
-            <div class="d-flex flex-wrap gap-2 mb-3">
-              <%= link_to "🎟️ View Ticket", ticket_path(ticket), class: "btn btn-success" %>
-              <%= link_to "✍️ Write a Review", new_event_review_path(event), class: "btn btn-outline-primary" %>
-            </div>
-            <div class="row">
-              <div class="col-md-6">
-                <p><strong>Ticket Number:</strong> <%= ticket.ticket_number %></p>
-              </div>
-              <div class="col-md-6">
-                <p><strong>Issued At:</strong> <%= ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
-              </div>
-            </div>
-          <% elsif registration.present? %>
-            <div class="alert alert-info mb-3 mt-3">
-              <p>You are registered but have not completed payment.</p>
-            </div>
-            <%= link_to "💳 Complete Payment", new_event_payment_path(event), class: "btn btn-primary" %>
+          <% if current_resource_owner.is_a?(AdminUser) %>
+            <!-- Admin-specific logic can go here -->
           <% else %>
-            <%= link_to "📝 Register for this Event", new_event_registration_path(event), class: "btn btn-primary mt-3" %>
+            <% registration = current_resource_owner.userable.registrations.find_by(event_id: event.id) %>
+            <% ticket = registration&.ticket %>
+            <% if ticket.present? %>
+              <div class="alert alert-success mb-3 mt-3">
+                <strong>Your Ticket is ready!</strong>
+              </div>
+              <div class="d-flex flex-wrap gap-2 mb-3">
+                <%= link_to "🎟️ View Ticket", ticket_path(ticket), class: "btn btn-success" %>
+                <%= link_to "✍️ Write a Review", new_event_review_path(event), class: "btn btn-outline-primary" %>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <p><strong>Ticket Number:</strong> <%= ticket.ticket_number %></p>
+                </div>
+                <div class="col-md-6">
+                  <p><strong>Issued At:</strong> <%= ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
+                </div>
+              </div>
+            <% elsif registration.present? %>
+              <div class="alert alert-info mb-3 mt-3">
+                <p>You are registered but have not completed payment.</p>
+              </div>
+              <%= link_to "💳 Complete Payment", new_event_payment_path(event), class: "btn btn-primary" %>
+            <% else %>
+              <%= link_to "📝 Register for this Event", new_event_registration_path(event), class: "btn btn-primary mt-3" %>
+            <% end %>
           <% end %>
         </div>
       </div>
