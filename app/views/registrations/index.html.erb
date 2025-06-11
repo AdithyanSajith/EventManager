@@ -4,13 +4,14 @@
 
 <h1>Registrations</h1>
 
+<% if @event %>
+  <div class="mb-3">
+    <%= link_to "ℹ️ Event Details", event_path(@event), class: "btn btn-info", style: "background-color: #17a2b8; border-color: #17a2b8; color: #fff;" %>
+  </div>
+<% end %>
+
 <div id="registrations">
   <% @registrations.each do |registration| %>
     <%= render partial: "registration", locals: { registration: registration } %>
-    <p>
-      <%= link_to "Show this registration", registration %>
-    </p>
   <% end %>
 </div>
-
-<%= link_to "New registration", new_registration_path %>

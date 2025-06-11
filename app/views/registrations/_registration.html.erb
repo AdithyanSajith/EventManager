@@ -1,17 +1,14 @@
 <div id="<%= dom_id registration %>">
   <p>
-    <strong>Status:</strong>
-    <%= registration.status %>
-  </p>
-
-  <p>
     <strong>Participant:</strong>
-    <%= registration.participant_id %>
+    <%= registration.participant&.name %>
   </p>
-
   <p>
-    <strong>Event:</strong>
-    <%= registration.event_id %>
+    <strong>Amount Paid:</strong>
+    <%= registration.payment&.amount.present? ? number_to_currency(registration.payment.amount) : 'Not paid' %>
   </p>
-
+  <p>
+    <strong>Registered At:</strong>
+    <%= registration.created_at.strftime('%d %b %Y, %I:%M %p') %>
+  </p>
 </div>

@@ -3,6 +3,7 @@
     <div class="card-body">
       <h2 class="card-title text-primary" style="color: #007bff;"><%= @event.title %></h2>
       <p class="card-text" style="color: #333;"><%= @event.description %></p>
+      <p><strong>Host:</strong> <%= @event.host.organisation %></p>
       <div class="row">
         <div class="col-md-6">
           <p><strong>Starts at:</strong> <%= @event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
@@ -23,6 +24,7 @@
           <div class="d-flex flex-wrap gap-2 mb-3">
             <%= link_to "🎟️ View Ticket", ticket_path(ticket), class: "btn btn-success", style: "background-color: #5cb85c; border-color: #5cb85c; color: #fff;" %>
             <%= link_to "✍️ Write a Review", new_event_review_path(@event), class: "btn btn-outline-primary", style: "border-color: #007bff; color: #007bff;" %>
+            <%= link_to "ℹ️ Event Details", event_path(@event), class: "btn btn-info", style: "background-color: #17a2b8; border-color: #17a2b8; color: #fff;" %>
           </div>
           <div class="row">
             <div class="col-md-6">

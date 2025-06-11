@@ -29,10 +29,7 @@ class ReviewsController < ApplicationController
 
       # Store snackbar data in session
       reviewable_name = @reviewable.respond_to?(:title) ? @reviewable.title : @reviewable.name
-      session[:review_snackbar] = {
-        action: :submitted,
-        details: "Thank you for reviewing #{reviewable_name}"
-      }
+      set_single_snackbar(:review, action: :submitted, details: "Thank you for reviewing #{reviewable_name}")
 
       redirect_to @reviewable
     else
@@ -40,7 +37,7 @@ class ReviewsController < ApplicationController
       render_flash_message(:error, @review.errors.full_messages.to_sentence)
 
       # Immediate snackbar
-      @snackbar_js = review_snackbar(:error, @review.errors.full_messages.to_sentence)
+      @snackbar_js = render_snackbar(:error, @review.errors.full_messages.to_sentence)
 
       render :new, status: :unprocessable_entity
     end
@@ -55,15 +52,12 @@ class ReviewsController < ApplicationController
 
       # Store snackbar data in session
       reviewable_name = @review.reviewable.respond_to?(:title) ? @review.reviewable.title : @review.reviewable.name
-      session[:review_snackbar] = {
-        action: :updated,
-        details: "Your review of #{reviewable_name} was updated"
-      }
+      set_single_snackbar(:review, action: :updated, details: "Your review of #{reviewable_name} was updated")
 
       redirect_to @review.reviewable
     else
       # Immediate snackbar
-      @snackbar_js = review_snackbar(:error, @review.errors.full_messages.to_sentence)
+      @snackbar_js = render_snackbar(:error, @review.errors.full_messages.to_sentence)
 
       render :edit, status: :unprocessable_entity
     end
@@ -79,12 +73,28 @@ class ReviewsController < ApplicationController
     render_flash_message(:success, "Review was deleted.")
 
     # Store snackbar data in session
-    session[:review_snackbar] = {
-      action: :deleted,
-      details: "Your review of #{reviewable_name} was deleted"
-    }
+    set_single_snackbar(:review, action: :deleted, details: "Your review of #{reviewable_name} was deleted")
 
     redirect_to reviews_path, status: :see_other
+  end
+
+  def host_reviews
+    @event_reviews = Review.where(reviewable_type: "Event", reviewable_id: current_resource_owner.userable.events.pluck(:id))
+    @venue_reviews = Review.where(reviewable_type: "Venue", participant: current_resource_owner.userable)
+  end
+
+  def create_venue_review
+    venue_id = params[:review][:venue_id]
+    @review = Review.new(review_params.except(:venue_id))
+    @review.reviewable = Venue.find(venue_id)
+    @review.participant = current_resource_owner.userable
+    if @review.save
+      redirect_to host_reviews_path, notice: 'Review submitted!'
+    else
+      @event_reviews = Review.where(reviewable_type: "Event", reviewable_id: current_resource_owner.userable.events.pluck(:id))
+      @venue_reviews = Review.where(reviewable_type: "Venue", participant: current_resource_owner.userable)
+      render :host_reviews
+    end
   end
 
   private
@@ -111,7 +121,7 @@ class ReviewsController < ApplicationController
   end
 
   def review_params
-    params.require(:review).permit(:rating, :comment)
+    params.require(:review).permit(:rating, :comment, :venue_id)
   end
 
   def authorize_participant!

@@ -1,16 +1,10 @@
-<% content_for :title, "Edit Event" %>
-
-<div class="container py-5">
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Edit Event</h2>
   <div class="row justify-content-center">
     <div class="col-lg-8 col-xl-6">
       <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white text-center">
-          <h4 class="mb-0">✏️ Edit Event</h4>
-        </div>
-
         <div class="card-body">
           <%= render "form", event: @event %>
-
           <div class="d-flex justify-content-between mt-4">
             <%= link_to "← Show this Event", @event, class: "btn btn-outline-primary" %>
             <%= link_to "Back to Events", events_path, class: "btn btn-secondary" %>

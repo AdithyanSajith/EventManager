@@ -1,0 +1,92 @@
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Reviews</h2>
+
+  <div class="mb-5">
+    <h3>Your Hosted Events Reviews</h3>
+    <% @event_reviews.each do |review| %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title"><%= review.reviewable.title %></h5>
+          <p class="card-text">Rating: <%= review.rating %></p>
+          <p class="card-text">Comment: <%= review.comment %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Display flash messages for success or error %>
+  <% if flash[:notice] %>
+    <div class="alert alert-success"><%= flash[:notice] %></div>
+  <% elsif flash[:alert] %>
+    <div class="alert alert-danger"><%= flash[:alert] %></div>
+  <% end %>
+
+  <div class="mb-5">
+    <h3>Add Venue Review</h3>
+    <%# The following form disables Turbo to avoid Hotwire interference with form submission %>
+    <%= form_with model: Review.new, url: create_venue_review_path, scope: :review, local: true, data: { turbo: false } do |form| %>
+      <%# Show validation errors if present %>
+      <% if @review && @review.errors.any? %>
+        <div class="alert alert-danger">
+          <ul>
+            <% @review.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      <div class="mb-3">
+        <%= form.label :venue_id, "Venue", class: "form-label" %>
+        <%= form.collection_select :venue_id, Venue.all, :id, :name, prompt: "Choose Venue", class: "form-select" %>
+      </div>
+      <div class="mb-3">
+        <%= form.label :rating, class: "form-label" %>
+        <%= form.number_field :rating, class: "form-control", min: 1, max: 5 %>
+      </div>
+      <div class="mb-3">
+        <%= form.label :comment, class: "form-label" %>
+        <%= form.text_area :comment, class: "form-control", rows: 3 %>
+      </div>
+      <%= form.submit "Submit Review", class: "btn btn-primary" %>
+    <% end %>
+  </div>
+
+  <%# DEBUG: Show form action and input names %>
+  <%# Remove this block after confirming correct form rendering %>
+  <% content_for :debug do %>
+    <div style="background: #ffe; border: 1px solid #cc0; padding: 10px; margin-bottom: 20px;">
+      <strong>Form action:</strong> <span id="venue-review-form-action"></span><br>
+      <strong>Input names:</strong>
+      <ul id="venue-review-form-inputs"></ul>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var form = document.querySelector('form[action*="create_venue_review"]');
+        if (form) {
+          document.getElementById('venue-review-form-action').textContent = form.action;
+          var ul = document.getElementById('venue-review-form-inputs');
+          Array.from(form.elements).forEach(function(el) {
+            if (el.name) {
+              var li = document.createElement('li');
+              li.textContent = el.name;
+              ul.appendChild(li);
+            }
+          });
+        }
+      });
+    </script>
+  <% end %>
+
+  <div class="mb-5">
+    <h3>Your Venue Reviews</h3>
+    <% @venue_reviews.each do |review| %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title"><%= review.reviewable.name %></h5>
+          <p class="card-text">Rating: <%= review.rating %></p>
+          <p class="card-text">Comment: <%= review.comment %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

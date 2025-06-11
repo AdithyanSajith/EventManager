@@ -1,14 +1,19 @@
 class RegistrationsController < ApplicationController
   layout "application"
-  before_action :set_event, only: [:new, :create], if: -> { params[:event_id].present? }
+  before_action :set_event, only: [:new, :create]
   before_action :set_registration, only: [:show]
 
   def index
-    @registrations = Registration.all
+    if params[:event_id]
+      @event = Event.find(params[:event_id])
+      @registrations = @event.registrations.includes(:participant, :ticket, :payment)
+    else
+      @registrations = Registration.all
+    end
   end
 
   def show
-    @registration = Registration.find(params[:id])
+    # @registration is set by before_action
   end
 
   def new
@@ -16,37 +21,37 @@ class RegistrationsController < ApplicationController
   end
 
   def create
+    # Only allow participants to register
+    unless current_resource_owner.userable_type == "Participant"
+      render_flash_message(:error, "Only participants can register for events.")
+      redirect_to events_path
+      return
+    end
+
     # Check if the user is already registered
     existing_registration = @event.registrations.find_by(participant_id: current_resource_owner.userable&.id)
-    
     if existing_registration
-      # If already registered, redirect to payment
       render_flash_message(:info, "You are already registered for this event.")
       redirect_to new_event_payment_path(@event)
       return
     end
 
+    # TODO: Add event open/registration full checks here if needed
+    # if @event.full? || !@event.registration_open?
+    #   render_flash_message(:error, "Registration is closed or event is full.")
+    #   redirect_to event_path(@event)
+    #   return
+    # end
+
     @registration = @event.registrations.new(participant_id: current_resource_owner.userable&.id)
 
     if @registration.save
-      # Standard flash message
       render_flash_message(:success, "You have successfully registered for this event!")
-      
-      # Store snackbar data in session to display after redirect
-      session[:registration_snackbar] = { 
-        action: :success, 
-        details: "Registration successful! Please complete payment to receive your ticket."
-      }
-      
-      # Redirect to payment page
+      set_single_snackbar(:registration, action: :success, details: "Registration successful! Please complete payment to receive your ticket.")
       redirect_to new_event_payment_path(@event)
     else
-      # Standard flash message
       render_flash_message(:error, "Registration failed.")
-      
-      # Immediate snackbar
       @snackbar_js = registration_snackbar(:error, @registration.errors.full_messages.to_sentence)
-      
       render :new
     end
   end
@@ -54,11 +59,7 @@ class RegistrationsController < ApplicationController
   private
 
   def set_event
-    if params[:event_id].present?
-      @event = Event.find(params[:event_id])
-    else
-      @event = nil
-    end
+    @event = Event.find(params[:event_id]) if params[:event_id].present?
   end
 
   def set_registration

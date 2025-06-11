@@ -48,4 +48,12 @@ module SnackbarNotifier
     session.delete(:review_snackbar)
     session.delete(:ticket_snackbar)
   end
+
+  # Set a single snackbar in session, clearing all others
+  def set_single_snackbar(type, action:, details:)
+    %i[payment_snackbar registration_snackbar review_snackbar ticket_snackbar].each do |key|
+      session.delete(key)
+    end
+    session["#{type}_snackbar".to_sym] = { action: action, details: details }
+  end
 end

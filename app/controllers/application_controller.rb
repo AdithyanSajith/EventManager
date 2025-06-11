@@ -76,10 +76,9 @@ class ApplicationController < ActionController::Base
     current_admin_user || current_user
   end
 
-  # Enhanced flash notifications for toastr
+  # Only show one flash message per type (success, error, etc.)
   def flash_message(type, text)
-    flash[type] ||= []
-    flash[type] << text
+    flash[type] = [text]
   end
 
   def render_flash_message(type, text, as_snackbar = false)

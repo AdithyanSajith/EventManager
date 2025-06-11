@@ -68,7 +68,7 @@ class PaymentsController < ApplicationController
       
       # Store success message for snackbar in session
       message = ticket_issued ? "Payment successful and ticket issued!" : "Payment successful!"
-      session[:payment_snackbar] = { action: :success, details: message }
+      set_single_snackbar(:payment, action: :success, details: message)
       
       # Redirect to ticket page instead of filtered events
       redirect_to ticket_path(@registration.ticket)

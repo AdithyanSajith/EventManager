@@ -12,14 +12,6 @@
       <h4 class="mb-3">Ticket Details</h4>
       <p><strong>🎟️ Ticket Number:</strong> <%= @ticket.ticket_number %></p>
       <p><strong>🕒 Issued At:</strong> <%= @ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
-
-      <hr>
-
-      <h5>Event Info</h5>
-      <p><strong>Title:</strong> <%= @registration.event.title %></p>
-      <p><strong>Venue:</strong> <%= @registration.event.venue.name %></p>
-      <p><strong>Starts At:</strong> <%= @registration.event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
-      <p><strong>Ends At:</strong> <%= @registration.event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
     </div>
   <% else %>
     <div class="alert alert-warning">

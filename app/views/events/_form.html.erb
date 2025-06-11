@@ -22,12 +22,12 @@
 
   <div class="mb-3">
     <%= form.label :starts_at, class: "form-label" %>
-    <%= form.datetime_select :starts_at, { default: Time.current + 1.hour }, { class: "form-select" } %>
+    <%= form.datetime_local_field :starts_at, class: "form-control" %>
   </div>
 
   <div class="mb-3">
     <%= form.label :ends_at, class: "form-label" %>
-    <%= form.datetime_select :ends_at, { default: Time.current + 2.hours }, { class: "form-select" } %>
+    <%= form.datetime_local_field :ends_at, class: "form-control" %>
   </div>
 
   <div class="mb-3">

@@ -18,6 +18,7 @@
     <!-- Toastr CSS via gem -->
     <%= stylesheet_link_tag "toastr" %>
     <%= javascript_include_tag "toastr" %>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   </head>
 
   <body>
@@ -55,7 +56,7 @@
                   <%= link_to "Past Events", past_events_path, class: "nav-link text-white" %>
                 </li>
                 <li class="nav-item">
-                  <%= link_to "Add Venue Review", new_venue_review_path(venue_id: 1), class: "nav-link text-white" %>
+                  <%= link_to "Reviews", host_reviews_path, class: "nav-link text-white" %>
                 </li>
               <% elsif current_resource_owner&.role == "participant" %>
                 <li class="nav-item">
@@ -69,10 +70,18 @@
                 </li>
               <% end %>
 
-              <li class="nav-item">
-                <%= button_to "Logout", destroy_user_session_path, method: :delete,
-                    form: { data: { turbo: false }, class: "d-inline" },
-                    class: "nav-link btn btn-link text-white", style: "padding: 0;" %>
+              <li class="nav-item dropdown ms-3">
+                <a class="nav-link dropdown-toggle d-flex align-items-center fw-bold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #fff; background: #0dcaf0; border-radius: 8px; padding: 6px 16px;">
+                  <i class="bi bi-person-circle me-2"></i>
+                  <%= current_resource_owner.email %>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                  <li>
+                    <%= button_to "Logout", destroy_user_session_path, method: :delete,
+                        form: { data: { turbo: false }, class: "d-inline" },
+                        class: "dropdown-item text-danger fw-bold", style: "text-align:left;" %>
+                  </li>
+                </ul>
               </li>
             <% else %>
               <% unless [root_path, new_user_session_path, new_user_registration_path].include?(request.path) %>
@@ -90,15 +99,18 @@
     </nav>
 
     <!-- Flash messages for toastr -->
-    <% if flash[:notice] %>
-      <div class="flash-notice" style="display:none;"><%= flash[:notice] %></div>
+    <% shown = false %>
+    <% flash.each do |key, value| %>
+      <% unless shown %>
+        <% if value.is_a?(Array) %>
+          <div class="flash-<%= key %>" style="display:none;"><%= value.first %></div>
+        <% else %>
+          <div class="flash-<%= key %>" style="display:none;"><%= value %></div>
+        <% end %>
+        <% shown = true %>
+      <% end %>
     <% end %>
-    <% if flash[:alert] %>
-      <div class="flash-alert" style="display:none;"><%= flash[:alert] %></div>
-    <% end %>
-    <% if flash[:error] %>
-      <div class="flash-error" style="display:none;"><%= flash[:error] %></div>
-    <% end %>
+    <% flash.clear %>
 
     <!-- Main Content -->
     <div class="container py-4">
@@ -126,4 +138,39 @@
       <% end %>
     </script>
   </body>
+
+  <style>
+    .navbar-brand {
+      font-size: 2rem;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 2px #00000022;
+    }
+    .btn-info, .btn-info:visited, .btn-info:active {
+      background: linear-gradient(90deg, #0dcaf0 0%, #0a58ca 100%);
+      color: #fff !important;
+      border: none;
+      font-weight: 600;
+      box-shadow: 0 2px 8px #0dcaf033;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .btn-info:hover {
+      background: linear-gradient(90deg, #0a58ca 0%, #0dcaf0 100%);
+      color: #fff !important;
+      box-shadow: 0 4px 16px #0dcaf055;
+    }
+    .btn-outline-primary {
+      border-radius: 8px;
+      font-weight: 600;
+      border-width: 2px;
+    }
+    .dropdown-menu {
+      min-width: 180px;
+      border-radius: 10px;
+      padding: 0.5rem 0;
+    }
+    .dropdown-item {
+      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+    }
+  </style>
 </html>

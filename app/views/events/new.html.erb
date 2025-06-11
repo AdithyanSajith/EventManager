@@ -1,38 +1,44 @@
-<%= form_with(model: @event, local: true, authenticity_token: true) do |form| %>
-  <div class="mb-3">
-    <%= form.label :title %>
-    <%= form.text_field :title, class: "form-control", placeholder: "Enter event title" %>
-  </div>
-
-  <div class="mb-3">
-    <%= form.label :description %>
-    <%= form.text_area :description, class: "form-control", rows: 4, placeholder: "Enter event description" %>
-  </div>
-
-  <div class="mb-3">
-    <%= form.label :starts_at %>
-    <%= form.datetime_select :starts_at, class: "form-control" %>
-  </div>
-
-  <div class="mb-3">
-    <%= form.label :ends_at %>
-    <%= form.datetime_select :ends_at, class: "form-control" %>
-  </div>
-
-  <div class="mb-3">
-    <%= form.label :venue_id, "Venue" %>
-    <div class="d-flex align-items-center gap-3">
-      <%= form.collection_select :venue_id, Venue.all, :id, :name, prompt: "Choose Venue", class: "form-select" %>
-      <%= link_to "➕ Add Venue", new_venue_path, class: "btn btn-outline-secondary btn-sm", target: "_blank" %>
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Create a New Event</h2>
+  <%= form_with(model: @event, local: true, authenticity_token: true) do |form| %>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <%= form.label :title, class: "form-label" %>
+        <%= form.text_field :title, class: "form-control", placeholder: "Enter event title" %>
+      </div>
+      <div class="col-md-6">
+        <%= form.label :description, class: "form-label" %>
+        <%= form.text_area :description, class: "form-control", rows: 4, placeholder: "Enter event description" %>
+      </div>
     </div>
-  </div>
 
-  <div class="mb-3">
-    <%= form.label :category_id, "Category" %>
-    <%= form.collection_select :category_id, Category.all, :id, :name, prompt: "Choose Category", class: "form-select" %>
-  </div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <%= form.label :starts_at, class: "form-label" %>
+        <%= form.date_field :starts_at, class: "form-control" %>
+      </div>
+      <div class="col-md-6">
+        <%= form.label :ends_at, class: "form-label" %>
+        <%= form.date_field :ends_at, class: "form-control" %>
+      </div>
+    </div>
 
-  <div class="mt-4">
-    <%= form.submit "Create Event", class: "btn btn-success w-100" %>
-  </div>
-<% end %>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <%= form.label :venue_id, "Venue", class: "form-label" %>
+        <div class="d-flex align-items-center gap-3">
+          <%= form.collection_select :venue_id, Venue.all, :id, :name, prompt: "Choose Venue", class: "form-select" %>
+          <%= link_to "➕ Add Venue", new_venue_path, class: "btn btn-outline-secondary btn-sm", target: "_blank" %>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <%= form.label :category_id, "Category", class: "form-label" %>
+        <%= form.collection_select :category_id, Category.all, :id, :name, prompt: "Choose Category", class: "form-select" %>
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <%= form.submit "Create Event", class: "btn btn-success btn-lg" %>
+    </div>
+  <% end %>
+</div>

@@ -16,17 +16,19 @@ module ToastrHelper
 
   # Generates the JavaScript for Toastr notifications
   def toastr_flash_messages
+    shown_types = Set.new
+    shown_messages = Set.new
     flash_messages = []
     flash.each do |type, message|
-      if message.is_a?(Array)
-        message.each do |individual_message|
-          flash_messages << toastr_js_for(type, individual_message)
-        end
-      else
-        flash_messages << toastr_js_for(type, message)
-      end
+      toastr_type = map_flash_to_toastr(type)
+      msg = message.is_a?(Array) ? message.first : message
+      # Only show if this message hasn't been shown
+      next if shown_messages.include?(msg)
+      shown_types << toastr_type
+      shown_messages << msg
+      flash_messages << toastr_js_for(type, msg)
     end
-    flash_messages.join("\n").html_safe
+    flash_messages.first.to_s.html_safe # Only show the first unique message
   end
 
   private  def toastr_js_for(flash_type, message, options = {})

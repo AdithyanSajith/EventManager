@@ -35,7 +35,7 @@ Rails.application.routes.draw do
   resources :events do
     resources :payments, only: [:new, :create]
     resources :reviews,  only: [:new, :create]
-    resources :registrations, only: [:new, :create]
+    resources :registrations, only: [:index, :new, :create]
   end
 
   resources :venues do
@@ -73,4 +73,6 @@ Rails.application.routes.draw do
 
   get 'events/:id/download_ics', to: 'events#download_ics', as: :download_event_ics
   get '/hosted_events', to: 'events#hosted', as: :hosted_events
+  get '/host_reviews', to: 'reviews#host_reviews', as: :host_reviews
+  post '/host_reviews/create_venue_review', to: 'reviews#create_venue_review', as: :create_venue_review
 end

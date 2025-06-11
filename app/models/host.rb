@@ -17,6 +17,10 @@ class Host < ApplicationRecord
     %w[user events venues]
   end
 
+  def to_s
+    organisation
+  end
+
   private
 
   def set_default_bio

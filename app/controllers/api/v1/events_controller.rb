@@ -4,6 +4,7 @@ module Api
       before_action :authenticate_resource_owner!, except: [:index, :show, :top_rated]
       before_action :set_event, only: [:show, :update, :destroy]
       before_action :check_event_time, only: [:update, :destroy]
+      before_action :ensure_host!, only: [:create, :update, :destroy]
       respond_to :json
 
       def index
@@ -16,10 +17,6 @@ module Api
       end
 
       def create
-        unless current_resource_owner&.role == 'host'
-          render json: { error: 'Only hosts can create events.' }, status: :forbidden and return
-        end
-
         @event = current_resource_owner.userable.events.build(event_params)
 
         if @event.save
@@ -30,8 +27,8 @@ module Api
       end
 
       def update
-        unless @event.host == current_resource_owner.userable
-          return render json: { error: 'Unauthorized' }, status: :unauthorized
+        unless owns_event?(@event)
+          return render json: { error: 'Only the event host can update this event.' }, status: :unauthorized
         end
 
         if @event.update(event_params)
@@ -42,8 +39,8 @@ module Api
       end
 
       def destroy
-        unless @event.host == current_resource_owner.userable
-          return render json: { error: 'Unauthorized' }, status: :unauthorized
+        unless owns_event?(@event)
+          return render json: { error: 'Only the event host can delete this event.' }, status: :unauthorized
         end
 
         @event.destroy
@@ -96,6 +93,16 @@ module Api
         if @event.starts_at < Time.current
           render json: { error: 'Cannot modify events that have already started.' }, status: :forbidden
         end
+      end
+
+      def ensure_host!
+        unless current_resource_owner&.role == 'host' && current_resource_owner.userable.present?
+          render json: { error: 'Only authenticated hosts can perform this action.' }, status: :forbidden
+        end
+      end
+
+      def owns_event?(event)
+        current_resource_owner&.role == 'host' && event.host_id == current_resource_owner.userable.id
       end
 
       helper_method :current_resource_owner
