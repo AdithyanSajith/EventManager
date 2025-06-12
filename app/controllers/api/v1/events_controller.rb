@@ -1,10 +1,10 @@
 module Api
   module V1
     class EventsController < ApplicationController
-      before_action :authenticate_resource_owner!, except: [:index, :show, :top_rated]
+      before_action :authenticate_resource_owner!, except: [:index, :show, :top_rated] # Allow public access to index and show actions
       before_action :set_event, only: [:show, :update, :destroy]
-      before_action :check_event_time, only: [:update, :destroy]
-      before_action :ensure_host!, only: [:create, :update, :destroy]
+      before_action :check_event_time, only: [:update, :destroy] # Prevent modification of past events
+      before_action :ensure_host!, only: [:create, :update, :destroy] 
       respond_to :json
 
       def index
@@ -13,7 +13,7 @@ module Api
       end
 
       def show
-        render json: @event, status: :ok
+        render json: @event, status: :ok # Render the event details
       end
 
       def create
@@ -73,19 +73,19 @@ module Api
         params.require(:event).permit(:title, :description, :starts_at, :ends_at, :category_id, :venue_id)
       end
 
-      def authenticate_resource_owner!
+      def authenticate_resource_owner!  # Ensure the user is authenticated
         if doorkeeper_token
-          doorkeeper_authorize!
-        else
-          authenticate_user!
+          doorkeeper_authorize! # Use Doorkeeper for OAuth token authentication
+        else # Use Devise for web-based authentication
+          authenticate_user! 
         end
       end
 
-      def current_resource_owner
+      def current_resource_owner # Determine the current resource owner based on the authentication method
         if doorkeeper_token
-          User.find(doorkeeper_token.resource_owner_id)
+          User.find(doorkeeper_token.resource_owner_id) # For OAuth, find the user by token
         else
-          current_user
+          current_user # For Devise, use the current user
         end
       end
 
@@ -96,13 +96,13 @@ module Api
       end
 
       def ensure_host!
-        unless current_resource_owner&.role == 'host' && current_resource_owner.userable.present?
+        unless current_resource_owner&.userable.present?
           render json: { error: 'Only authenticated hosts can perform this action.' }, status: :forbidden
         end
       end
 
       def owns_event?(event)
-        current_resource_owner&.role == 'host' && event.host_id == current_resource_owner.userable.id
+        event.host_id == current_resource_owner.userable.id if current_resource_owner&.userable.present?
       end
 
       helper_method :current_resource_owner

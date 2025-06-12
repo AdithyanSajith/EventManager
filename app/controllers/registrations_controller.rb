@@ -1,4 +1,8 @@
-class RegistrationsController < ApplicationController
+class RegistrationsController < ApplicationController #handle event registrations
+  before_action :authenticate_resource_owner! # Ensure user is authenticated
+  before_action :ensure_participant! # Ensure the user is a participant
+
+  # Use the application layout for this controller
   layout "application"
   before_action :set_event, only: [:new, :create]
   before_action :set_registration, only: [:show]

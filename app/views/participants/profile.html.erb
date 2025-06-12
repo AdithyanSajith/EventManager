@@ -22,9 +22,6 @@
 
       <dt class="col-sm-4">Contact Number</dt>
       <dd class="col-sm-8"><%= @participant.number.presence || "Not provided" %></dd>
-
-      <dt class="col-sm-4">Role</dt>
-      <dd class="col-sm-8 text-capitalize"><%= @participant.role %></dd>
     </dl>
 
     <%= link_to "✏️ Edit Profile", edit_user_registration_path, class: "btn btn-primary mt-3" %>

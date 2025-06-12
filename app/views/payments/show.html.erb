@@ -1,4 +1,4 @@
-<% if current_resource_owner&.role == "participant" %>
+<% if current_resource_owner&.userable_type == "Participant" %>
   <% if @ticket %>
     <div class="alert alert-success mt-4">
       <h4>Your Ticket</h4>

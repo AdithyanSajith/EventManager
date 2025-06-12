@@ -30,7 +30,7 @@ class EventsController < ApplicationController
       # Admin users can see all registrations
       if current_resource_owner.is_a?(AdminUser)
         @registrations = @event.registrations.includes(:user)
-      # For regular users, show appropriate information based on role
+      # For regular users, show appropriate information based on userable type or association
       elsif current_resource_owner.is_a?(User)
         if current_resource_owner.userable_type == "Participant"
           @registration = current_resource_owner.userable.registrations.find_by(event_id: @event.id)
@@ -178,9 +178,9 @@ class EventsController < ApplicationController
       return true
     end
     
-    # For regular users, check for host role
+    # For regular users, check for host association
     unless current_resource_owner&.is_a?(User) && 
-           current_resource_owner&.role == "host" && 
+           current_resource_owner&.userable.present? && 
            current_resource_owner&.userable_type == "Host"
       render_flash_message(:error, "Only hosts can access this page.")
       redirect_to root_path
@@ -193,9 +193,10 @@ class EventsController < ApplicationController
       return true
     end
     
-    # For regular users, check for participant role
+    # For regular users, check for participant association
     unless current_resource_owner&.is_a?(User) && 
-           current_resource_owner&.role == "participant"
+           current_resource_owner&.userable.present? && 
+           current_resource_owner&.userable_type == "Participant"
       render_flash_message(:error, "Only participants can access this section.")
       redirect_to root_path
     end

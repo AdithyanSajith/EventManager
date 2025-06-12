@@ -135,8 +135,8 @@ class ReviewsController < ApplicationController
       return true
     end
 
-    # For regular users, check for participant role
-    unless current_resource_owner.is_a?(User) && current_resource_owner.role == "participant"
+    # For regular users, check for participant association
+    unless current_resource_owner.is_a?(User) && current_resource_owner.userable_type == "Participant"
       render_flash_message(:error, "Only participants or hosts can review.")
       redirect_to root_path
     end

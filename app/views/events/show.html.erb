@@ -14,7 +14,7 @@
           <p><strong>Category:</strong> <%= @event.category.name %></p>
         </div>
       </div>
-      <% if current_resource_owner.is_a?(AdminUser) || current_resource_owner&.role == "participant" %>
+      <% if current_resource_owner.is_a?(AdminUser) || current_resource_owner&.userable_type == "Participant" %>
         <% registration = @registration %>
         <% ticket = @ticket %>
         <% if ticket.present? %>
@@ -46,7 +46,7 @@
     </div>
   </div>
 
-  <% if current_resource_owner.is_a?(AdminUser) || (current_resource_owner&.role == "host" && current_resource_owner.userable == @event.host) %>
+  <% if current_resource_owner.is_a?(AdminUser) || (current_resource_owner&.userable_type == "Host" && current_resource_owner.userable == @event.host) %>
     <div class="d-flex gap-2 mt-4">
       <%= link_to "✏️ Edit Event", edit_event_path(@event), class: "btn btn-outline-warning btn-sm", style: "border-color: #ffc107; color: #ffc107;" %>
       <%= button_to "🗑️ Delete Event", event_path(@event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-outline-danger btn-sm", style: "border-color: #dc3545; color: #dc3545;" %>

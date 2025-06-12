@@ -58,7 +58,7 @@
                 <li class="nav-item">
                   <%= link_to "Reviews", host_reviews_path, class: "nav-link text-white" %>
                 </li>
-              <% elsif current_resource_owner&.role == "participant" %>
+              <% elsif current_resource_owner&.userable_type == "Participant" %>
                 <li class="nav-item">
                   <%= link_to "Change Category", change_category_path, class: "nav-link text-white" %>
                 </li>

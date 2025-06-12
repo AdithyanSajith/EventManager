@@ -8,7 +8,7 @@ RSpec.describe ReviewsController, type: :controller do
   let(:review) { create(:review, reviewable: event, participant: participant_user.userable) }
   
   before { sign_in participant_user }
-
+  
   describe "POST #create" do
     it "creates a new review for an event" do
       # Ensure registration and ticket exist for participant and event
@@ -49,3 +49,7 @@ RSpec.describe ReviewsController, type: :controller do
     end
   end
 end
+
+
+
+

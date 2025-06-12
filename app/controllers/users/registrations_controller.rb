@@ -1,10 +1,10 @@
 module Users
-  class RegistrationsController < Devise::RegistrationsController
+  class RegistrationsController < Devise::RegistrationsController #Handles user registration and profile management
     before_action :redirect_if_authenticated, only: [:new, :create] #prevents login users to sign up
     before_action :configure_permitted_parameters, only: [:create, :update] #allow custom fields while signup and update
 
     # POST /resource
-    def create
+    def create # Handles user registration
       build_resource(sign_up_params)
       begin
         # Build userable before saving user
@@ -41,27 +41,27 @@ module Users
           render :new, status: :unprocessable_entity and return
         end
 
-        ActiveRecord::Base.transaction do
+        ActiveRecord::Base.transaction do # Ensure both user and userable are saved together
           userable.save!
           resource.userable = userable
           resource.save!
         end
 
         flash[:notice] = "Sign up successful! Welcome to Event Manager."
-        if resource.active_for_authentication?
+        if resource.active_for_authentication? # Check if the user is active
           set_flash_message! :notice, :signed_up
-          sign_up(resource_name, resource)
-          respond_with resource, location: after_sign_up_path_for(resource)
+          sign_up(resource_name, resource) # Sign in the user after successful registration
+          respond_with resource, location: after_sign_up_path_for(resource) # Redirect to appropriate path after sign up
         else
-          set_flash_message! :notice, "signed_up_but_#{resource.inactive_message}"
+          set_flash_message! :notice, "signed_up_but_#{resource.inactive_message}" # User is inactive
           expire_data_after_sign_in!
           respond_with resource, location: after_inactive_sign_up_path_for(resource)
         end
       rescue ActiveRecord::RecordInvalid => e
-        flash.now[:alert] = e.record.errors.full_messages.to_sentence.presence || e.message
+        flash.now[:alert] = e.record.errors.full_messages.to_sentence.presence || e.message # Handle validation errors
         clean_up_passwords resource
         render :new, status: :unprocessable_entity
-      rescue => e
+      rescue => e # Handle any other exceptions
         flash.now[:alert] = e.message.presence || "Registration failed."
         clean_up_passwords resource
         render :new, status: :unprocessable_entity
@@ -93,11 +93,11 @@ module Users
     end
 
     def configure_permitted_parameters
-      extra_fields = %i[
+      extra_fields = %i[        
         name role interest city birthdate
         organisation website number bio
       ]
-      devise_parameter_sanitizer.permit(:sign_up, keys: extra_fields)
+      devise_parameter_sanitizer.permit(:sign_up, keys: extra_fields) 
       devise_parameter_sanitizer.permit(:account_update, keys: extra_fields)
     end
 

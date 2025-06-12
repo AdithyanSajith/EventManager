@@ -57,10 +57,10 @@ class TicketsController < ApplicationController
     end
     
     # For regular users, ensure they are participants
-    unless current_user && current_user.role == "participant"
+    unless current_user && current_user.userable_type == "Participant"
       render_flash_message(:error, "Only participants can access tickets.")
       
-      # Show snackbar for unauthorized role
+      # Show snackbar for unauthorized userable type
       session[:ticket_snackbar] = { 
         action: :error, 
         details: "Only participants can access tickets"
