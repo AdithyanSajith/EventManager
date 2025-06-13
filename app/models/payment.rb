@@ -2,6 +2,8 @@ class Payment < ApplicationRecord
   belongs_to :registration
 
   validates :amount, numericality: { greater_than_or_equal_to: 0 }
+  # Card number must be present, numeric, and 10-20 digits (adjust as needed)
+  validates :card_number, presence: true, format: { with: /\A\d{10,20}\z/, message: "must be 10-20 digits" }
 
   # Callback to notify participant when payment is completed
   after_create :send_payment_confirmation

@@ -1,6 +1,6 @@
 module Api
   module V1
-    class EventsController < ApplicationController
+    class EventsController < Api::V1::BaseController
       before_action :authenticate_resource_owner!, except: [:index, :show, :top_rated] # Allow public access to index and show actions
       before_action :set_event, only: [:show, :update, :destroy]
       before_action :check_event_time, only: [:update, :destroy] # Prevent modification of past events
@@ -28,7 +28,7 @@ module Api
 
       def update
         unless owns_event?(@event)
-          return render json: { error: 'Only the event host can update this event.' }, status: :unauthorized
+          return render json: { error: 'Only the event host can update this event.' }, status: :forbidden
         end
 
         if @event.update(event_params)
@@ -40,7 +40,7 @@ module Api
 
       def destroy
         unless owns_event?(@event)
-          return render json: { error: 'Only the event host can delete this event.' }, status: :unauthorized
+          return render json: { error: 'Only the event host can delete this event.' }, status: :forbidden
         end
 
         @event.destroy
@@ -70,7 +70,7 @@ module Api
       end
 
       def event_params
-        params.require(:event).permit(:title, :description, :starts_at, :ends_at, :category_id, :venue_id)
+        params.require(:event).permit(:title, :description, :starts_at, :ends_at, :category_id, :venue_id, :fee)
       end
 
       def authenticate_resource_owner!  # Ensure the user is authenticated

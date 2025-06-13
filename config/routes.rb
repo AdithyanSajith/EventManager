@@ -64,7 +64,7 @@ Rails.application.routes.draw do
         post 'payment', to: 'events/payments#create'
       end
 
-      resources :tickets, only: [:show]
+      resources :tickets, only: [:index, :show]
       resource :profile, only: [:show, :update]
 
       get 'user_registered_events', to: 'events/registrations#user_registered_events'

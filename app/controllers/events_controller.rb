@@ -141,7 +141,20 @@ class EventsController < ApplicationController
   end
 
   def past_events
-    @events = Event.where("starts_at < ?", Time.current)
+    if current_resource_owner.is_a?(User) && current_resource_owner.userable_type == "Host"
+      # Show only past events hosted by this host
+      @events = Event.where(host_id: current_resource_owner.userable.id)
+                     .where("ends_at < ?", Time.current)
+    elsif current_resource_owner.is_a?(User) && current_resource_owner.userable_type == "Participant"
+      # Show only past events the participant registered for
+      participant = current_resource_owner.userable
+      @events = Event.joins(:registrations)
+                     .where(registrations: { participant_id: participant.id })
+                     .where("ends_at < ?", Time.current)
+                     .distinct
+    else
+      @events = Event.none
+    end
   end
 
   def hosted
@@ -169,7 +182,7 @@ class EventsController < ApplicationController
   end
 
   def event_params
-    params.require(:event).permit(:title, :description, :starts_at, :ends_at, :category_id, :venue_id)
+    params.require(:event).permit(:title, :description, :starts_at, :ends_at, :category_id, :venue_id, :fee)
   end
 
   def authorize_host!

@@ -1,6 +1,7 @@
 class RegistrationsController < ApplicationController #handle event registrations
   before_action :authenticate_resource_owner! # Ensure user is authenticated
-  before_action :ensure_participant! # Ensure the user is a participant
+  before_action :ensure_participant!, only: [:new, :create] # Only participants can register
+  before_action :ensure_event_host_or_participant!, only: [:index, :show] # Hosts can view registrations for their events
 
   # Use the application layout for this controller
   layout "application"
@@ -68,5 +69,16 @@ class RegistrationsController < ApplicationController #handle event registration
 
   def set_registration
     @registration = Registration.find(params[:id])
+  end
+
+  def ensure_event_host_or_participant!
+    @event = Event.find(params[:event_id]) if params[:event_id]
+    user = current_resource_owner
+    is_host = user.userable_type == "Host" && @event && @event.host_id == user.userable.id
+    is_participant = user.userable_type == "Participant"
+    unless is_host || is_participant
+      render_flash_message(:error, "You are not authorized to view registrations for this event.")
+      redirect_to root_path
+    end
   end
 end

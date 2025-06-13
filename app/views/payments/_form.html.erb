@@ -13,7 +13,8 @@
 
   <div>
     <%= form.label :amount, style: "display: block" %>
-    <%= form.text_field :amount %>
+    <%= form.text_field :amount, value: payment.registration.event.fee, readonly: true %>
+    <small class="text-muted">(Set by host, not editable)</small>
   </div>
 
   <div>

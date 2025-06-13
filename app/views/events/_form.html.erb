@@ -43,6 +43,11 @@
     </div>
   </div>
 
+  <div class="mb-3">
+    <%= form.label :fee, "Event Fee (₹)", class: "form-label" %>
+    <%= form.number_field :fee, class: "form-control", step: 0.01, min: 0, placeholder: "Enter event fee" %>
+  </div>
+
   <div class="text-center mt-4">
     <%= form.submit event.persisted? ? "Update Event" : "Create Event", class: "btn btn-success px-4 py-2" %>
   </div>

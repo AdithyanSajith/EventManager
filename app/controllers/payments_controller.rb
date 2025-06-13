@@ -76,9 +76,6 @@ class PaymentsController < ApplicationController
       # Standard flash message
       render_flash_message(:error, @payment.errors.full_messages.to_sentence)
       
-      # Snackbar message shown immediately
-      @snackbar_js = payment_snackbar(:error, @payment.errors.full_messages.to_sentence)
-      
       render :new, status: :unprocessable_entity
     end
   end
@@ -105,7 +102,9 @@ class PaymentsController < ApplicationController
   end
 
   def payment_params
-    params.require(:payment).permit(:registration_id, :amount, :card_number, :paid_at)
+    permitted = params.require(:payment).permit(:card_number)
+    permitted[:amount] = @event.fee.to_f
+    permitted
   end
 
   def authorize_participant!

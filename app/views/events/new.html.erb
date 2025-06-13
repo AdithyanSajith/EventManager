@@ -37,6 +37,13 @@
       </div>
     </div>
 
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <%= form.label :fee, "Event Fee (₹)", class: "form-label" %>
+        <%= form.number_field :fee, class: "form-control", step: 0.01, min: 0, placeholder: "Enter event fee" %>
+      </div>
+    </div>
+
     <div class="text-center mt-4">
       <%= form.submit "Create Event", class: "btn btn-success btn-lg" %>
     </div>
