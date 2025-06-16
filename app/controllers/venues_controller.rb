@@ -22,7 +22,7 @@ class VenuesController < ApplicationController
     @venue = current_resource_owner.userable.venues.build(venue_params)
 
     if @venue.save
-      redirect_to venues_path, notice: "Venue was successfully created."
+      redirect_to new_event_path, notice: "Venue was successfully created. You can now create your event using this venue."
     else
       render :new, status: :unprocessable_entity
     end

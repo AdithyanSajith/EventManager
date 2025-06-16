@@ -127,7 +127,7 @@ class EventsController < ApplicationController
     elsif current_resource_owner.is_a?(User) && current_resource_owner.userable == @event.host
       @event.destroy
       render_flash_message(:success, "Event deleted successfully.")
-      redirect_to events_path
+      redirect_to hosted_events_path
     else
       render_flash_message(:error, "You are not authorized to delete this event.")
       redirect_to events_path
@@ -178,7 +178,11 @@ class EventsController < ApplicationController
   private
 
   def set_event
-    @event = Event.find(params[:id])
+    @event = Event.find_by(id: params[:id])
+    unless @event
+      render_flash_message(:error, "Event not found or already deleted.")
+      redirect_to events_path and return
+    end
   end
 
   def event_params

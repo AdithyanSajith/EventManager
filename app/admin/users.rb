@@ -13,7 +13,7 @@ if defined?(User)
     # ✅ Filters in the sidebar
     filter :name
     filter :email
-    filter :role, as: :select, collection: ["host", "participant"]
+    filter :userable_type, as: :select, label: "Role", collection: ["Host", "Participant"]
     filter :city
     filter :interest
     filter :birthdate

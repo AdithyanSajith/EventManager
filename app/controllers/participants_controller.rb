@@ -52,15 +52,23 @@ class ParticipantsController < ApplicationController
   end
 
   def update_interest
-    if current_resource_owner.update(interest: params[:interest])
-      redirect_to filtered_events_path, notice: "Interest updated!"
+    if current_user.userable_type == "Participant" && current_user.userable.present?
+      if current_user.userable.update(interest: params[:interest])
+        redirect_to filtered_events_path, notice: "Interest updated!"
+      else
+        redirect_to change_category_path, alert: "Update failed."
+      end
     else
-      redirect_to change_category_path, alert: "Update failed."
+      redirect_to root_path, alert: "Only participants can update interest."
     end
   end
 
   def profile
-    @participant = current_resource_owner
+    if current_user&.userable_type == "Participant" && current_user.userable.present?
+      @participant = current_user.userable
+    else
+      redirect_to root_path, alert: "Only participants can view this page." and return
+    end
   end
 
   # Add this method so current_resource_owner works with Devise
@@ -72,15 +80,13 @@ class ParticipantsController < ApplicationController
 
   # Ensure the user is a participant or an admin
   def authorize_participant!
-    # Allow admin users automatic access
-    if current_resource_owner.is_a?(AdminUser)
-      return true
+    # Allow admin users automatic access (but do not allow them to view /profile)
+    if current_user.is_a?(AdminUser)
+      redirect_to root_path, alert: "Admins cannot access the participant profile page." and return
     end
-    
     # For regular users, check for participant role
-    unless current_resource_owner.is_a?(User) && current_resource_owner.role == "participant"
-      render_flash_message(:error, "Only participants can access this page.")
-      redirect_to root_path
+    unless current_user.is_a?(User) && current_user.userable_type == "Participant" && current_user.userable.present?
+      redirect_to root_path, alert: "Only participants can access this page." and return
     end
   end
 

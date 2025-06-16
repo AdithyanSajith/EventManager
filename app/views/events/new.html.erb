@@ -28,7 +28,7 @@
         <%= form.label :venue_id, "Venue", class: "form-label" %>
         <div class="d-flex align-items-center gap-3">
           <%= form.collection_select :venue_id, Venue.all, :id, :name, prompt: "Choose Venue", class: "form-select" %>
-          <%= link_to "➕ Add Venue", new_venue_path, class: "btn btn-outline-secondary btn-sm", target: "_blank" %>
+          <%= link_to "➕ Add Venue", new_venue_path, class: "btn btn-outline-secondary btn-sm" %>
         </div>
       </div>
       <div class="col-md-6">

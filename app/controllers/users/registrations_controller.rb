@@ -73,8 +73,28 @@ module Users
       self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
       prev_unconfirmed_email = resource.unconfirmed_email if resource.respond_to?(:unconfirmed_email)
 
+      # Extract userable params from the form
+      userable_params = params[:userable] || {}
       resource_updated = update_resource(resource, account_update_params)
       yield resource if block_given?
+
+      # Update userable fields if present and userable exists
+      if resource.userable.present? && userable_params.present?
+        case resource.role
+        when "participant"
+          resource.userable.update(
+            interest: userable_params[:interest],
+            city: userable_params[:city],
+            birthdate: userable_params[:birthdate]
+          )
+        when "host"
+          resource.userable.update(
+            organisation: userable_params[:organisation],
+            website: userable_params[:website],
+            bio: userable_params[:bio]
+          )
+        end
+      end
 
       if resource_updated
         set_flash_message_for_update(resource, prev_unconfirmed_email)

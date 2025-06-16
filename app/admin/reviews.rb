@@ -9,7 +9,6 @@ ActiveAdmin.register Review do
 
   # ✅ Filters
   filter :rating, as: :select, collection: 1..5
-  filter :participant
   filter :reviewable_type, as: :select, collection: ["Event", "Venue"]
   filter :created_at
 
