@@ -1,60 +1,4 @@
 <div class="container my-5">
-  <div class="card mb-4 shadow-sm" style="background-color: #f9f9f9; border: 1px solid #ddd;">
-    <div class="card-body">
-      <h2 class="card-title text-primary" style="color: #007bff;"><%= @event.title %></h2>
-      <p class="card-text" style="color: #333;"><%= @event.description %></p>
-      <p><strong>Host:</strong> <%= @event.host.organisation %></p>
-      <p><strong>Fee:</strong> <%= @event.fee.present? && @event.fee > 0 ? number_to_currency(@event.fee, unit: '₹') : 'Free' %></p>
-      <div class="row">
-        <div class="col-md-6">
-          <p><strong>Starts at:</strong> <%= @event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
-          <p><strong>Ends at:</strong> <%= @event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
-        </div>
-        <div class="col-md-6">
-          <p><strong>Venue:</strong> <%= @event.venue.name %></p>
-          <p><strong>Category:</strong> <%= @event.category.name %></p>
-        </div>
-      </div>
-      <% if current_resource_owner.is_a?(AdminUser) || current_resource_owner&.userable_type == "Participant" %>
-        <% registration = @registration %>
-        <% ticket = @ticket %>
-        <% if ticket.present? %>
-          <div class="alert alert-success mb-3 mt-3" style="background-color: #e6f4ea; color: #155724;">
-            <strong>Your Ticket is ready!</strong>
-          </div>
-          <div class="d-flex flex-wrap gap-2 mb-3">
-            <%= link_to "🎟️ View Ticket", ticket_path(ticket), class: "btn btn-success", style: "background-color: #5cb85c; border-color: #5cb85c; color: #fff;" %>
-            <%= link_to "✍️ Write a Review", new_event_review_path(@event), class: "btn btn-outline-primary", style: "border-color: #007bff; color: #007bff;" %>
-            <%= link_to "ℹ️ Event Details", event_path(@event), class: "btn btn-info", style: "background-color: #17a2b8; border-color: #17a2b8; color: #fff;" %>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <p><strong>Ticket Number:</strong> <%= ticket.ticket_number %></p>
-            </div>
-            <div class="col-md-6">
-              <p><strong>Issued At:</strong> <%= ticket.issued_at.strftime("%d %b %Y, %I:%M %p") %></p>
-            </div>
-          </div>
-        <% elsif registration.present? %>
-          <div class="alert alert-info mb-3 mt-3" style="background-color: #cce5ff; color: #004085;">
-            <p>You are registered but have not completed payment.</p>
-          </div>
-          <%= link_to "💳 Complete Payment", new_event_payment_path(@event), class: "btn btn-primary", style: "background-color: #007bff; border-color: #007bff; color: #fff;" %>
-        <% else %>
-          <%= link_to "📝 Register for this Event", new_event_registration_path(@event), class: "btn btn-primary mt-3", style: "background-color: #007bff; border-color: #007bff; color: #fff;" %>
-        <% end %>
-      <% end %>
-    </div>
-  </div>
-
-  <% if current_resource_owner.is_a?(AdminUser) || (current_resource_owner&.userable_type == "Host" && current_resource_owner.userable == @event.host) %>
-    <div class="d-flex gap-2 mt-4">
-      <%= link_to "✏️ Edit Event", edit_event_path(@event), class: "btn btn-outline-warning btn-sm", style: "border-color: #ffc107; color: #ffc107;" %>
-      <%= button_to "🗑️ Delete Event", event_path(@event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-outline-danger btn-sm", style: "border-color: #dc3545; color: #dc3545;" %>
-    </div>
-  <% end %>
-
-  <!-- Reviews Section -->
   <div class="mt-5">
     <h3 style="color: #333;">📝 Reviews</h3>
     <% if @event.reviews.any? %>
@@ -76,9 +20,6 @@
       </div>
     <% else %>
       <p class="text-muted">No reviews yet for this event.</p>
-    <% end %>
-    <% if current_resource_owner.is_a?(AdminUser) %>
-      <%= link_to "✍️ Write a Review", new_event_review_path(@event), class: "btn btn-outline-primary mt-3", style: "border-color: #007bff; color: #007bff;" %>
     <% end %>
   </div>
 </div>

@@ -1,4 +1,29 @@
-<h2>All Reviews</h2>
-<% @reviews.each do |review| %>
+<h2>Venue Reviews</h2>
+
+<% if current_resource_owner.is_a?(User) && current_resource_owner.userable_type == "Host" %>
+  <div class="mb-4" style="max-width: 600px;">
+    <h4>Add a Review for a Venue</h4>
+    <%# Debug: Output the form action %>
+    <% form_action = create_venue_review_path %>
+    <!-- FORM ACTION: <%= form_action %> -->
+    <%= form_with url: form_action, method: :post, local: true, html: { action: form_action, method: :post } do |f| %>
+      <div class="mb-2">
+        <%= label_tag 'review[venue_id]', "Select Venue", class: "form-label" %>
+        <%= select_tag 'review[venue_id]', options_from_collection_for_select(Venue.all, :id, :name), prompt: "Choose a venue", class: "form-select" %>
+      </div>
+      <div class="mb-2">
+        <%= label_tag 'review[rating]', "Rating", class: "form-label" %>
+        <%= number_field_tag 'review[rating]', nil, in: 1..5, class: "form-control", required: true %>
+      </div>
+      <div class="mb-2">
+        <%= label_tag 'review[comment]', "Comment", class: "form-label" %>
+        <%= text_area_tag 'review[comment]', nil, class: "form-control", rows: 2, required: true %>
+      </div>
+      <%= submit_tag "Add Review", class: "btn btn-primary" %>
+    <% end %>
+  </div>
+<% end %>
+
+<% @reviews.select { |review| review.reviewable_type == "Venue" }.each do |review| %>
   <%= render partial: "review", locals: { review: review } %>
 <% end %>

@@ -1,5 +1,6 @@
 //= require jquery
 //= require toastr
+//= require datepicker_min_today
 //= require_tree .
 // Show toastr notifications for Rails flash messages
 function showToastrFromFlash() {

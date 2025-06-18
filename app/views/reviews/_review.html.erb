@@ -1,22 +1,18 @@
-<div id="<%= dom_id review %>">
-  <p>
-    <strong>Rating:</strong>
-    <%= review.rating %>
-  </p>
-
-  <p>
+<% event_or_venue = review.reviewable %>
+<div class="review-card" style="background: #f8faff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); padding: 1.7rem; margin-bottom: 2rem; max-width: 600px;">
+  <div class="d-flex align-items-center mb-2 flex-wrap">
+    <span class="badge bg-primary me-2" style="font-size: 1.15rem; padding: 0.6em 1.2em;">Rating: <%= review.rating %></span>
+    <% if review.reviewable_type == "Event" %>
+      <span class="badge bg-info text-dark ms-2" style="font-size: 1rem;">Event: <%= event_or_venue.title %> <span class="text-secondary" style="font-size:0.95em;">(#<%= event_or_venue.id %>)</span></span>
+    <% elsif review.reviewable_type == "Venue" %>
+      <span class="badge bg-secondary ms-2" style="font-size: 1rem;">Venue: <%= event_or_venue.name %></span>
+    <% end %>
+  </div>
+  <div class="mb-2">
     <strong>Comment:</strong>
-    <%= review.comment %>
-  </p>
-
-  <p>
-    <strong>Participant:</strong>
-    <%= review.participant_id %>
-  </p>
-
-  <p>
-    <strong>Event:</strong>
-    <%= review.event_id %>
-  </p>
-
+    <span style="font-size: 1.15rem; color: #222;"><%= review.comment %></span>
+  </div>
+  <div class="text-muted" style="font-size: 1rem;">
+    <i class="bi bi-person-circle"></i> Host: <%= event_or_venue.host.organisation %>
+  </div>
 </div>

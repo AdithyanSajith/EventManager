@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   use_doorkeeper
 
+  devise_for :admin_users, ActiveAdmin::Devise.config
+  ActiveAdmin.routes(self)
+
   devise_for :users, module: 'users', controllers: {
     registrations: 'users/registrations',
     sessions: 'users/sessions',
@@ -8,9 +11,6 @@ Rails.application.routes.draw do
     confirmations: 'users/confirmations',
     unlocks: 'users/unlocks'
   }
-
-  devise_for :admin_users, ActiveAdmin::Devise.config
-  ActiveAdmin.routes(self)
 
   root "home#index"
 

@@ -8,44 +8,53 @@
 <%= form_for(resource, as: resource_name, url: user_registration_path, html: { id: "signup_form" }) do |f| %>
   <%= render "devise/shared/error_messages", resource: resource %>
 
-  <!-- Participant Fields -->
-  <div id="participant_fields" style="display: none;">
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name, required: true %>
+  </div>
+
+  <div class="field">
+    <%= f.label :role %><br />
+    <%= f.select :role, [['Participant', 'participant'], ['Host', 'host']],
+                 { prompt: "Select Role" }, { required: true, id: "user_role" } %>
+  </div>
+
+  <div id="participant_fields" style="display: <%= (resource.role == 'participant' || resource.role.blank?) ? 'block' : 'none' %>;">
     <div class="field">
-      <%= f.label :interest %><br />
-      <%= f.text_area :interest %>
+      <%= label_tag 'userable[city]', 'City' %><br />
+      <%= text_field_tag 'userable[city]', nil %>
     </div>
 
     <div class="field">
-      <%= f.label :city %><br />
-      <%= f.text_field :city %>
+      <%= label_tag 'userable[birthdate]', 'Birthdate' %><br />
+      <%= date_field_tag 'userable[birthdate]', nil %>
     </div>
 
     <div class="field">
-      <%= f.label :birthdate %><br />
-      <%= f.date_field :birthdate %>
+      <%= label_tag 'userable[interest]', 'Interest' %><br />
+      <%= select_tag 'userable[interest]', options_from_collection_for_select(Category.all, :name, :name), prompt: 'Select Interest', class: 'form-select' %>
     </div>
   </div>
 
-  <!-- Host Fields -->
   <div id="host_fields" style="display: none;">
     <div class="field">
-      <%= f.label :organisation %><br />
-      <%= f.text_field :organisation %>
+      <%= label_tag 'userable[organisation]', 'Organisation' %><br />
+      <%= text_field_tag 'userable[organisation]', nil %>
     </div>
 
     <div class="field">
-      <%= f.label :website %><br />
-      <%= f.url_field :website %>
+      <%= label_tag 'userable[website]', 'Website' %><br />
+      <%= url_field_tag 'userable[website]', nil %>
     </div>
 
     <div class="field">
-      <%= f.label :number, "Contact Number" %><br />
-      <%= f.telephone_field :number, maxlength: 10, pattern: "\\d{10}" %>
+      <%= label_tag 'userable[number]', 'Contact Number' %><br />
+      <%= telephone_field_tag 'userable[number]', nil, maxlength: 10, pattern: '\\d{10}' %>
     </div>
 
     <div class="field">
-      <%= f.label :bio %><br />
-      <%= f.text_area :bio, rows: 3 %>
+      <%= label_tag 'userable[bio]', 'Bio' %><br />
+      <%= text_area_tag 'userable[bio]', nil, rows: 3 %>
     </div>
   </div>
 
@@ -87,6 +96,7 @@
     }
 
     roleSelect.addEventListener("change", toggleFields);
-    toggleFields();
+    // Ensure correct fields are shown on initial load, even if browser autofills or pre-selects
+    setTimeout(toggleFields, 0);
   });
 </script>

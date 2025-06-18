@@ -2,39 +2,37 @@ module Users
   class RegistrationsController < Devise::RegistrationsController #Handles user registration and profile management
     before_action :redirect_if_authenticated, only: [:new, :create] #prevents login users to sign up
     before_action :configure_permitted_parameters, only: [:create, :update] #allow custom fields while signup and update
+    skip_before_action :authenticate_user!, only: [:new, :create] # Allow unauthenticated users to access new and create actions
 
     # POST /resource
     def create # Handles user registration
       build_resource(sign_up_params)
       begin
-        # Build userable before saving user
+        # Only use permitted userable fields for the selected role
+        userable_params = permitted_userable_params
         case resource.role
         when "host"
-          required = [resource.organisation, resource.website, resource.bio, resource.number]
+          host_fields = %i[organisation website bio number]
+          host_params = userable_params.slice(*host_fields.map(&:to_s))
+          required = host_fields.map { |f| host_params[f.to_s] }
           if required.any?(&:blank?)
             flash.now[:alert] = "All host fields (organisation, website, bio, number) must be present."
             clean_up_passwords resource
             render :new, status: :unprocessable_entity and return
           end
-          userable = Host.new(
-            organisation: resource.organisation,
-            website: resource.website,
-            bio: resource.bio,
-            number: resource.number
-          )
+          userable = Host.new(host_params)
         when "participant"
-          required = [resource.name, resource.interest, resource.city, resource.birthdate]
+          participant_fields = %i[name interest city birthdate]
+          participant_params = userable_params.slice(*participant_fields.map(&:to_s))
+          # Name is on user, so get from resource
+          participant_params["name"] = resource.name
+          required = participant_fields.map { |f| participant_params[f.to_s] }
           if required.any?(&:blank?)
             flash.now[:alert] = "All participant fields (name, interest, city, birthdate) must be present."
             clean_up_passwords resource
             render :new, status: :unprocessable_entity and return
           end
-          userable = Participant.new(
-            name: resource.name,
-            interest: resource.interest,
-            city: resource.city,
-            birthdate: resource.birthdate
-          )
+          userable = Participant.new(participant_params)
         else
           flash.now[:alert] = "Invalid role selected."
           clean_up_passwords resource
@@ -75,8 +73,15 @@ module Users
 
       # Extract userable params from the form
       userable_params = params[:userable] || {}
+      flash.now[:alert] = "Before update: name=#{resource.name}, params name=#{account_update_params[:name]}"
       resource_updated = update_resource(resource, account_update_params)
+      flash.now[:notice] = "After update: name=#{resource.name}"
       yield resource if block_given?
+
+      # Always sync participant name if role is participant
+      if resource.userable.present? && resource.role == "participant"
+        resource.userable.update(name: resource.name)
+      end
 
       # Update userable fields if present and userable exists
       if resource.userable.present? && userable_params.present?
@@ -138,7 +143,7 @@ module Users
     end
 
     def after_sign_up_path_for(resource)
-      resource.role == "host" ? host_dashboard_path : choose_category_path
+      resource.role == "host" ? host_dashboard_path : filtered_events_path
     end
 
     def assign_userable(user)
@@ -172,6 +177,12 @@ module Users
       end
 
       user.update!(userable: userable)
+    end
+
+    private
+
+    def permitted_userable_params
+      params.fetch(:userable, {}).permit(:organisation, :website, :bio, :number, :name, :interest, :city, :birthdate)
     end
   end
 end

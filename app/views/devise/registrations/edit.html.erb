@@ -10,10 +10,6 @@
 
   <% if resource.role == "participant" && resource.userable.present? %>
     <div class="field mb-3">
-      <%= f.label :interest %><br />
-      <%= text_area_tag 'userable[interest]', resource.userable&.interest, rows: 3, maxlength: 300, class: "form-control" %>
-    </div>
-    <div class="field mb-3">
       <%= f.label :city %><br />
       <%= text_field_tag 'userable[city]', resource.userable&.city, maxlength: 100, class: "form-control" %>
     </div>

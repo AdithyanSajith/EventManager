@@ -3,7 +3,6 @@ class Review < ApplicationRecord
   belongs_to :participant, polymorphic: true
 
   validates :participant_id, uniqueness: { scope: [:reviewable_type, :reviewable_id], message: "already reviewed this item" }
-  validates :reviewable_id, uniqueness: { scope: [:reviewable_type], message: "only one review per venue is allowed" }
 
   # Callback to update event rating after review creation
   after_create :update_event_rating

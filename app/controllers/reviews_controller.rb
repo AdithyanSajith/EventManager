@@ -89,7 +89,7 @@ class ReviewsController < ApplicationController
     @review.reviewable = Venue.find(venue_id)
     @review.participant = current_resource_owner.userable
     if @review.save
-      redirect_to host_reviews_path, notice: 'Review submitted!'
+      redirect_to reviews_path, notice: 'Review submitted!'
     else
       @event_reviews = Review.where(reviewable_type: "Event", reviewable_id: current_resource_owner.userable.events.pluck(:id))
       @venue_reviews = Review.where(reviewable_type: "Venue", participant: current_resource_owner.userable)

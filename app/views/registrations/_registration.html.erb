@@ -1,14 +1,16 @@
 <div id="<%= dom_id registration %>">
-  <p>
-    <strong>Participant:</strong>
-    <%= registration.participant&.name %>
-  </p>
-  <p>
-    <strong>Amount Paid:</strong>
-    <%= registration.payment&.amount.present? ? number_to_currency(registration.payment.amount) : 'Not paid' %>
-  </p>
-  <p>
-    <strong>Registered At:</strong>
-    <%= registration.created_at.strftime('%d %b %Y, %I:%M %p') %>
-  </p>
+  <div class="card shadow-sm p-4 h-100">
+    <div class="mb-2">
+      <span class="fw-bold text-primary">Participant:</span>
+      <span><%= registration.participant&.name %></span>
+    </div>
+    <div class="mb-2">
+      <span class="fw-bold text-success">Amount Paid:</span>
+      <span><%= registration.payment&.amount.present? ? number_to_currency(registration.payment.amount) : '<span class="text-danger">Not paid</span>'.html_safe %></span>
+    </div>
+    <div>
+      <span class="fw-bold">Registered At:</span>
+      <span><%= registration.created_at.strftime('%d %b %Y, %I:%M %p') %></span>
+    </div>
+  </div>
 </div>

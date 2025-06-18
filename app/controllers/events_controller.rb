@@ -1,4 +1,5 @@
 class EventsController < ApplicationController
+  skip_before_action :authenticate_user!, only: [:show]
   layout "application"
   before_action :authenticate_resource_owner!, except: [:show]
   before_action :set_event, only: [:show, :edit, :update, :destroy]
@@ -161,10 +162,10 @@ class EventsController < ApplicationController
     Rails.logger.debug "Current Resource Owner: #{current_resource_owner.inspect}"
 
     if current_resource_owner.is_a?(AdminUser)
-      @events = Event.all
+      @events = Event.where('starts_at > ?', Time.current)
     elsif current_resource_owner.is_a?(User) && current_resource_owner.userable_type == "Host"
       Rails.logger.debug "Host ID: #{current_resource_owner.userable.id}"
-      @events = Event.where(host_id: current_resource_owner.userable.id)
+      @events = Event.where(host_id: current_resource_owner.userable.id).where('starts_at > ?', Time.current)
       Rails.logger.debug "Hosted Events: #{@events.inspect}"
     else
       @events = Event.none

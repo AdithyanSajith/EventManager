@@ -25,6 +25,9 @@
           <dt class="col-sm-4">Contact Number</dt>
           <dd class="col-sm-8"><%= @participant.user.number %></dd>
         <% end %>
+
+        <dt class="col-sm-4">Last Updated</dt>
+        <dd class="col-sm-8"><%= @participant.updated_at %></dd>
       </dl>
 
       <%= link_to "✏️ Edit Profile", edit_user_registration_path, class: "btn btn-primary mt-3" %>

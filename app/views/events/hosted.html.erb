@@ -10,10 +10,27 @@
               <p class="card-text"><%= event.description %></p>
               <p><strong>Starts at:</strong> <%= event.starts_at.strftime("%d %b %Y, %I:%M %p") %></p>
               <p><strong>Ends at:</strong> <%= event.ends_at.strftime("%d %b %Y, %I:%M %p") %></p>
-              <div class="d-flex gap-2">
-                <%= link_to "Edit", edit_event_path(event), class: "btn btn-warning" %>
-                <%= link_to "View Registrations", event_registrations_path(event), class: "btn btn-info" %>
-                <%= button_to "Delete", event_path(event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+              <div class="d-flex gap-2 mb-2">
+                <%= link_to "Edit", edit_event_path(event), class: "btn flex-fill fw-bold w-100 text-center", style: "background: linear-gradient(90deg, #b4ec51 0%, #429321 100%); color: #fff; border: none;" %>
+                <%= link_to "View Registrations", event_registrations_path(event), class: "btn btn-info flex-fill fw-bold w-100 text-center" %>
+                <%= link_to "Delete", event_path(event), method: :delete, data: { confirm: "Are you sure?" }, class: "btn flex-fill fw-bold w-100 text-center", style: "background: linear-gradient(90deg, #f9d423 0%, #ff4e50 100%); color: #fff; border: none;" %>
+                <%= link_to "Reviews", event_path(event, anchor: 'reviews'), class: "btn btn-info flex-fill fw-bold w-100 text-center" %>
+              </div>
+              <div class="collapse" id="reviews-<%= event.id %>">
+                <div class="border rounded p-2 bg-light mt-2">
+                  <strong>Reviews:</strong>
+                  <% if event.reviews.any? %>
+                    <% event.reviews.each do |review| %>
+                      <div class="mb-2">
+                        <span class="fw-bold"><%= review.participant&.name || "Anonymous" %></span>
+                        <span>⭐ <%= review.rating %></span>
+                        <div><%= review.comment %></div>
+                      </div>
+                    <% end %>
+                  <% else %>
+                    <div class="text-muted">No reviews yet.</div>
+                  <% end %>
+                </div>
               </div>
             </div>
           </div>

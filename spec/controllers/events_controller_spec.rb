@@ -26,6 +26,8 @@ RSpec.describe EventsController, type: :controller do
   describe 'GET #show' do
     it 'allows guests to view event details' do
       get :show, params: { id: event.id }
+      puts "Response status: ", response.status
+      puts "Response body: ", response.body
       expect(response).to be_successful
       expect(assigns(:event)).to eq(event)
     end

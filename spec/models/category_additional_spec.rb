@@ -5,7 +5,7 @@ RSpec.describe Category, type: :model do
   describe "validations" do
     it "allows whitespace in name" do
       category = create(:category, name: "  Music  ")
-      expect(category.name).to include("Music")
+      expect(category.name).to eq("music")
     end
     
     it "allows lowercase names" do

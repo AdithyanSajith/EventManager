@@ -2,16 +2,20 @@
 
 <% content_for :title, "Registrations" %>
 
-<h1>Registrations</h1>
+<h1 class="display-4 mb-4 text-center">Registrations</h1>
 
 <% if @event %>
-  <div class="mb-3">
-    <%= link_to "ℹ️ Event Details", event_path(@event), class: "btn btn-info", style: "background-color: #17a2b8; border-color: #17a2b8; color: #fff;" %>
+  <div class="mb-4 text-center">
+    <%= link_to "ℹ️ Event Details", event_path(@event), class: "btn btn-info btn-lg px-4 shadow" %>
   </div>
 <% end %>
 
-<div id="registrations">
-  <% @registrations.each do |registration| %>
-    <%= render partial: "registration", locals: { registration: registration } %>
-  <% end %>
+<div class="container">
+  <div class="row justify-content-center">
+    <% @registrations.each do |registration| %>
+      <div class="col-md-8 mb-4">
+        <%= render partial: "registration", locals: { registration: registration } %>
+      </div>
+    <% end %>
+  </div>
 </div>

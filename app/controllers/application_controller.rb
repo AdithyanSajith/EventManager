@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
   } #Enable CSRF protection for all except JSON and Turbo Stream requests
 
   before_action :configure_permitted_parameters, if: :devise_controller? # Ensure Devise parameters are permitted for sign up and account update
-  before_action :authenticate_user! # Ensure user is authenticated for all actions
+  before_action :authenticate_user!, unless: :devise_admin_controller? # Ensure user is authenticated for all actions except ActiveAdmin
   before_action :authenticate_host!, if: -> { controller_name == 'hosts' } # Ensure only hosts can access host-related actions
   before_action :authenticate_resource_owner!, if: -> { doorkeeper_token.present? } # Authenticate resource owner for API requests
   before_action :store_user_location!, if: :storable_location? # Store user location for after sign in
@@ -80,7 +80,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  private # Configure Devise parameters for sign up and account update
+  private
+
+  def devise_admin_controller? # Check if the current controller is an ActiveAdmin controller
+    is_a?(ActiveAdmin::BaseController) || (defined?(ActiveAdmin) && self.class < ActiveAdmin::BaseController)
+  end
 
   # For Devise redirection
   def storable_location? # Check if the location can be stored for after sign in

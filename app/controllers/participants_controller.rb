@@ -53,7 +53,9 @@ class ParticipantsController < ApplicationController
 
   def update_interest
     if current_user.userable_type == "Participant" && current_user.userable.present?
-      if current_user.userable.update(interest: params[:interest])
+      # Store the category name instead of ID
+      category = Category.find_by(id: params[:interest])
+      if category && current_user.userable.update(interest: category.name)
         redirect_to filtered_events_path, notice: "Interest updated!"
       else
         redirect_to change_category_path, alert: "Update failed."

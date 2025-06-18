@@ -23,7 +23,7 @@
 
   <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg" style="background-color: #127cff;">
       <div class="container-fluid">
         <% if current_resource_owner.is_a?(AdminUser) %>
           <%= link_to "Event Manager", events_path, class: "navbar-brand text-white fw-bold" %>
@@ -46,43 +46,41 @@
                   <%= link_to "View Other Events", other_events_path, class: "nav-link text-white" %>
                 </li>
               <% elsif current_resource_owner&.userable_type == "Host" %>
-                <li class="nav-item">
-                  <%= link_to "My Events", hosted_events_path, class: "navbar-brand text-white fw-bold" %>
-                </li>
-                <li class="nav-item">
-                  <%= link_to "Create Event", new_event_path, class: "nav-link text-white" %>
-                </li>
-                <li class="nav-item">
-                  <%= link_to "Past Events", past_events_path, class: "nav-link text-white" %>
-                </li>
-                <li class="nav-item">
-                  <%= link_to "Reviews", host_reviews_path, class: "nav-link text-white" %>
-                </li>
+                <div class="d-flex align-items-center gap-3">
+                  <a href="/events/new" class="btn fw-bold px-4 py-2" style="background-color: #fff7d6; color: #7a4f01; border: none;">Create Event</a>
+                  <a href="/past_events" class="btn fw-bold px-4 py-2" style="background-color: #ffe3e3; color: #a12a2a; border: none;">Past Events</a>
+                  <a href="/reviews" class="btn fw-bold px-4 py-2" style="background-color: #e6e6ff; color: #2a2a7a; border: none;">Reviews</a>
+                  <div class="dropdown">
+                    <button class="btn fw-bold px-2 py-1" style="background-color: #ff6f6f; color: #fff; border: none; font-size: 0.95rem; min-width: unset;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="bi bi-person-circle"></i> <span class="fw-bold"><%= current_resource_owner.email %></span> <i class="bi bi-caret-down-fill"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li>
+                        <%= button_to "Logout", destroy_user_session_path, method: :delete,
+                            form: { data: { turbo: false }, class: "d-inline" },
+                            class: "dropdown-item text-danger fw-bold", style: "text-align:left;" %>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               <% elsif current_resource_owner&.userable_type == "Participant" %>
-                <li class="nav-item">
-                  <%= link_to "Change Category", change_category_path, class: "nav-link text-white" %>
-                </li>
-                <li class="nav-item">
-                  <%= link_to "My Profile", profile_path, class: "nav-link text-white" %>
-                </li>
-                <li class="nav-item">
-                  <%= link_to "Past Events", past_events_path, class: "nav-link text-white" %>
-                </li>
+                <div class="d-flex align-items-center gap-3">
+                  <a href="/profile" class="btn fw-bold px-4 py-2" style="background-color: #e6e6ff; color: #2a2a7a; border: none;">My Profile</a>
+                  <a href="/past_events" class="btn fw-bold px-4 py-2" style="background-color: #ffe3e3; color: #a12a2a; border: none;">Past Events</a>
+                  <div class="dropdown">
+                    <button class="btn fw-bold px-2 py-1" style="background-color: #6f6fff; color: #fff; border: none; font-size: 0.95rem; min-width: unset;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="bi bi-person-circle"></i> <span class="fw-bold"><%= current_resource_owner.email %></span> <i class="bi bi-caret-down-fill"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li>
+                        <%= button_to "Logout", destroy_user_session_path, method: :delete,
+                            form: { data: { turbo: false }, class: "d-inline" },
+                            class: "dropdown-item text-danger fw-bold", style: "text-align:left;" %>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               <% end %>
-
-              <li class="nav-item dropdown ms-3">
-                <a class="nav-link dropdown-toggle d-flex align-items-center fw-bold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #fff; background: #0dcaf0; border-radius: 8px; padding: 6px 16px;">
-                  <i class="bi bi-person-circle me-2"></i>
-                  <%= current_resource_owner.email %>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-                  <li>
-                    <%= button_to "Logout", destroy_user_session_path, method: :delete,
-                        form: { data: { turbo: false }, class: "d-inline" },
-                        class: "dropdown-item text-danger fw-bold", style: "text-align:left;" %>
-                  </li>
-                </ul>
-              </li>
             <% else %>
               <% unless [root_path, new_user_session_path, new_user_registration_path].include?(request.path) %>
                 <li class="nav-item">

@@ -1,4 +1,11 @@
 <div class="container my-4">
+  <div class="row mb-4">
+    <div class="col-md-4 offset-md-8">
+      <%= form_with url: filtered_events_path, method: :get, local: true, html: { class: 'd-flex align-items-center' } do |form| %>
+        <%= form.collection_select :category_id, Category.all, :id, :name, { prompt: 'Change Category', selected: params[:category_id] }, { class: 'form-select me-2', onchange: 'this.form.submit();' } %>
+      <% end %>
+    </div>
+  </div>
   <% @events = @events.where("starts_at > ?", Time.current) %>
   <% if @events.any? %>
     <% @events.each do |event| %>

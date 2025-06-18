@@ -1,6 +1,7 @@
 module Api
   module V1
     class EventsController < Api::V1::BaseController
+      skip_before_action :doorkeeper_authorize!, only: [:index, :show, :top_rated]
       before_action :authenticate_resource_owner!, except: [:index, :show, :top_rated] # Allow public access to index and show actions
       before_action :set_event, only: [:show, :update, :destroy]
       before_action :check_event_time, only: [:update, :destroy] # Prevent modification of past events

@@ -2,6 +2,25 @@
 
 <%= render @category %>
 
+<h2>Events in this Category</h2>
+<% if @category.events.any? %>
+  <div class="row">
+    <% @category.events.each do |event| %>
+      <div class="col-md-6 mb-3">
+        <div class="card p-3 shadow-sm">
+          <h5 class="card-title"><%= event.title %></h5>
+          <p class="card-text"><%= event.description.truncate(100) %></p>
+          <p><strong>Starts:</strong> <%= event.starts_at.strftime('%d %b %Y, %I:%M %p') if event.starts_at %></p>
+          <p><strong>Ends:</strong> <%= event.ends_at.strftime('%d %b %Y, %I:%M %p') if event.ends_at %></p>
+          <%= link_to "View Event", event_path(event), class: "btn btn-primary btn-sm" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <p class="text-muted">No events in this category.</p>
+<% end %>
+
 <div>
   <%= link_to "Edit this category", edit_category_path(@category) %> |
   <%= link_to "Back to categories", categories_path %>

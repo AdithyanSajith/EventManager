@@ -44,7 +44,7 @@ class VenuesController < ApplicationController
   private
 
   def set_venue
-    @venue = current_resource_owner.userable.venues.find(params[:id])
+    @venue = Venue.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to venues_path, alert: "Venue not found."
   end
