@@ -1,8 +1,9 @@
 module Api
   module V1
     module Events
-      class PaymentsController < ApplicationController
+      class PaymentsController < Api::V1::BaseController
         before_action :authenticate_resource_owner!
+        before_action :ensure_participant!
         before_action :set_event
         respond_to :json
 
@@ -25,6 +26,12 @@ module Api
         end
 
         private
+
+        def ensure_participant!
+          unless current_resource_owner&.userable_type == 'Participant' && current_resource_owner.userable.present?
+            render json: { error: 'Only participants can make payments.' }, status: :forbidden
+          end
+        end
 
         def set_event
           @event = Event.find(params[:event_id])

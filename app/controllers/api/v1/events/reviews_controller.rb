@@ -3,6 +3,7 @@ module Api
     module Events
       class ReviewsController < ApplicationController
         before_action :authenticate_resource_owner!
+        before_action :ensure_participant!, only: [:create]
         before_action :set_event
         respond_to :json
 
@@ -17,7 +18,12 @@ module Api
 
         # POST /api/v1/events/:event_id/reviews
         def create
-          review = @event.reviews.new(review_params.merge(participant: current_resource_owner.userable))
+          # Only allow participants to review events they attended
+          participant = current_resource_owner.userable
+          unless participant && participant.registrations.exists?(event: @event)
+            return render json: { error: 'You can only review events you attended.' }, status: :forbidden
+          end
+          review = @event.reviews.new(review_params.merge(participant: participant))
           if review.save
             render json: { message: "Review submitted." }, status: :created
           else
@@ -26,6 +32,13 @@ module Api
         end
 
         private
+
+        # Ensure the current user is a participant
+        def ensure_participant!
+          unless current_resource_owner&.userable_type == 'Participant' && current_resource_owner.userable.present?
+            render json: { error: 'Only participants can submit reviews.' }, status: :forbidden
+          end
+        end
 
         # Set event based on event_id param
         def set_event

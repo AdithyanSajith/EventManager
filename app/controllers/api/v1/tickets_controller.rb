@@ -1,11 +1,13 @@
 module Api
   module V1
-    class TicketsController < ApplicationController
+    class TicketsController < Api::V1::BaseController
       before_action :authenticate_resource_owner!
+      before_action :ensure_participant!
       respond_to :json
 
       def show
         ticket = Ticket.find(params[:id])
+        # Only allow participants to view their own tickets
         if ticket.registration.participant_id != current_resource_owner.userable&.id
           render json: { error: "Unauthorized access." }, status: :unauthorized
         else
@@ -29,7 +31,7 @@ module Api
         unless current_resource_owner.userable_type == 'Participant' && participant.present?
           render json: { error: 'Only participants can view tickets.' }, status: :forbidden and return
         end
-
+        # Only show tickets belonging to the current participant
         tickets = Ticket.joins(:registration).where(registrations: { participant_id: participant.id })
         render json: tickets.map { |ticket|
           {
@@ -65,6 +67,12 @@ module Api
         end
       end
       helper_method :current_resource_owner
+
+      def ensure_participant!
+        unless current_resource_owner&.userable_type == 'Participant' && current_resource_owner.userable.present?
+          render json: { error: 'Only participants can access tickets.' }, status: :forbidden
+        end
+      end
     end
   end
 end

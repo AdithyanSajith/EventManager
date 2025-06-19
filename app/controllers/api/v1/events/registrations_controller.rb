@@ -1,10 +1,9 @@
 module Api
   module V1
     module Events
-      class RegistrationsController < ApplicationController
-        skip_before_action :verify_authenticity_token, only: [:status]
-
+      class RegistrationsController < Api::V1::BaseController
         before_action :authenticate_resource_owner!
+        before_action :ensure_participant!
         before_action :set_event
 
         respond_to :json
@@ -26,16 +25,11 @@ module Api
         # POST /api/v1/events/:event_id/registrations
         def create
           participant = current_resource_owner.userable
-          unless participant
-            return render json: { error: "Participant profile not found" }, status: :unprocessable_entity
-          end
-
           registration = Registration.find_or_initialize_by(participant: participant, event: @event)
 
           if registration.persisted?
             render json: { message: "Already registered for this event." }, status: :ok
           else
-            registration.assign_attributes(registration_params)
             if registration.save
               render json: { message: "Registration successful." }, status: :created
             else
@@ -46,9 +40,10 @@ module Api
 
         private
 
-        def registration_params
-          # Permit only participant_id and event_id inside registration params
-          params.require(:registration).permit(:participant_id, :event_id)
+        def ensure_participant!
+          unless current_resource_owner&.userable_type == 'Participant' && current_resource_owner.userable.present?
+            render json: { error: 'Only participants can register for events.' }, status: :forbidden
+          end
         end
 
         def set_event

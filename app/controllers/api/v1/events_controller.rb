@@ -6,6 +6,7 @@ module Api
       before_action :set_event, only: [:show, :update, :destroy]
       before_action :check_event_time, only: [:update, :destroy] # Prevent modification of past events
       before_action :ensure_host!, only: [:create, :update, :destroy] 
+      before_action :ensure_event_belongs_to_host!, only: [:update, :destroy]
       respond_to :json
 
       def index
@@ -18,6 +19,10 @@ module Api
       end
 
       def create
+        # Only allow hosts to create events for themselves
+        unless current_resource_owner.userable_type == 'Host'
+          return render json: { error: 'Only hosts can create events.' }, status: :forbidden
+        end
         @event = current_resource_owner.userable.events.build(event_params)
 
         if @event.save
@@ -28,6 +33,7 @@ module Api
       end
 
       def update
+        # Only allow hosts to update their own events
         unless owns_event?(@event)
           return render json: { error: 'Only the event host can update this event.' }, status: :forbidden
         end
@@ -40,6 +46,7 @@ module Api
       end
 
       def destroy
+        # Only allow hosts to delete their own events
         unless owns_event?(@event)
           return render json: { error: 'Only the event host can delete this event.' }, status: :forbidden
         end
@@ -66,12 +73,40 @@ module Api
 
       def set_event
         @event = Event.find(params[:id])
+        # Only allow hosts to access their own events for update/destroy
+        if %w[update destroy].include?(action_name) && current_resource_owner.userable_type == 'Host'
+          unless @event.host_id == current_resource_owner.userable.id
+            render json: { error: 'You do not have permission to access this event.' }, status: :forbidden
+          end
+        end
       rescue ActiveRecord::RecordNotFound
-        render json: { error: "Event not found" }, status: :not_found
+        render json: { error: 'Event not found' }, status: :not_found
       end
 
       def event_params
         params.require(:event).permit(:title, :description, :starts_at, :ends_at, :category_id, :venue_id, :fee)
+      end
+
+      def check_event_time
+        if @event.starts_at < Time.current
+          render json: { error: 'Cannot modify events that have already started.' }, status: :forbidden
+        end
+      end
+
+      def ensure_host!
+        unless current_resource_owner&.userable_type == 'Host' && current_resource_owner.userable.present?
+          render json: { error: 'Only authenticated hosts can perform this action.' }, status: :forbidden
+        end
+      end
+
+      def ensure_event_belongs_to_host!
+        unless @event.host_id == current_resource_owner.userable.id
+          render json: { error: 'You do not have permission to modify this event.' }, status: :forbidden
+        end
+      end
+
+      def owns_event?(event)
+        event.host_id == current_resource_owner.userable.id if current_resource_owner&.userable.present?
       end
 
       def authenticate_resource_owner!  # Ensure the user is authenticated
@@ -88,22 +123,6 @@ module Api
         else
           current_user # For Devise, use the current user
         end
-      end
-
-      def check_event_time
-        if @event.starts_at < Time.current
-          render json: { error: 'Cannot modify events that have already started.' }, status: :forbidden
-        end
-      end
-
-      def ensure_host!
-        unless current_resource_owner&.userable.present?
-          render json: { error: 'Only authenticated hosts can perform this action.' }, status: :forbidden
-        end
-      end
-
-      def owns_event?(event)
-        event.host_id == current_resource_owner.userable.id if current_resource_owner&.userable.present?
       end
 
       helper_method :current_resource_owner
