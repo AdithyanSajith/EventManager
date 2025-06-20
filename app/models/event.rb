@@ -6,6 +6,7 @@ class Event < ApplicationRecord
   has_many :reviews, as: :reviewable, dependent: :destroy
   has_many :registrations, dependent: :destroy
   has_many :participants, through: :registrations
+  has_many :tickets, dependent: :destroy
 
   validates :title, :description, :starts_at, :ends_at, :venue_id, :category_id, :host_id, presence: true
   validate :start_and_end_dates_must_be_valid

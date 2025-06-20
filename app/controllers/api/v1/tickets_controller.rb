@@ -31,8 +31,10 @@ module Api
         unless current_resource_owner.userable_type == 'Participant' && participant.present?
           render json: { error: 'Only participants can view tickets.' }, status: :forbidden and return
         end
-        # Only show tickets belonging to the current participant
-        tickets = Ticket.joins(:registration).where(registrations: { participant_id: participant.id })
+        # Only show tickets belonging to the current participant for future events
+        tickets = Ticket.joins(:registration => :event)
+                        .where(registrations: { participant_id: participant.id })
+                        .where('events.starts_at > ?', Time.current)
         render json: tickets.map { |ticket|
           {
             id: ticket.id,

@@ -10,7 +10,20 @@ module Api
       respond_to :json
 
       def index
-        @events = Event.all
+        if current_resource_owner&.userable_type == 'Host'
+          # Show all strictly future events hosted by the current host (not started yet)
+          @events = Event.where(host_id: current_resource_owner.userable.id)
+                         .where('starts_at > ?', Time.current)
+        elsif current_resource_owner&.userable_type == 'Participant'
+          # Only show strictly future events where the participant has a ticket
+          @events = Event.joins(registrations: :ticket)
+                         .where('starts_at > ?', Time.current)
+                         .where(registrations: { participant_id: current_resource_owner.userable.id })
+                         .distinct
+        else
+          # Only show strictly future events for public
+          @events = Event.where('starts_at > ?', Time.current)
+        end
         render json: @events, status: :ok
       end
 

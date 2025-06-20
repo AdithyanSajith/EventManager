@@ -12,6 +12,10 @@ Doorkeeper.configure do
   skip_client_authentication_for_password_grant true
   access_token_expires_in 2.hours
 
+  use_refresh_token
+
+  default_scopes  :public
+
   # ✅ Strong AdminUser restriction for Doorkeeper UI
   admin_authenticator do |controller|
     if controller.respond_to?(:current_admin_user)
